@@ -78,5 +78,6 @@ This produced one `createSurface` with `components` (`root`, `root_children_0…
 - `@a2ui/agent@0.1.0` is published. Its dependencies are `@a2ui/web_core ^0.15.0` and `antlr4ng 3.0.16`, and it ships `src/inference-formats/express` and `direct-json`.
 - Its README targets v0.9 and v1.0 (README.md:5). Both v1.0 and Express **are** in the published build.
 - `@a2ui/agent` imports `@a2ui/web_core/v1_0`, which pulls in lit. **Under the `browser` export condition it fails with `HTMLElement is not defined`**, while under Node it works because of lit's SSR shim. Run it server-side in Node. See [web-core-rn-safety](web-core-rn-safety.md).
+  - **Correction (spike 2026-11-03):** importing only the package root plus `@a2ui/web_core/catalog` bundles lit-free under the browser condition and `parseResponse` runs without a DOM (305 KB gzip). Client-side compile is viable on web; Hermes untested. See `spikes/express-client/`.
 
 Related: [macros](macros.md) · [protocol](protocol-v1.md) · [conformance](conformance-fixtures.md)
