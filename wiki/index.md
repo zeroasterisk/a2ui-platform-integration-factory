@@ -54,7 +54,13 @@ Source-verified notes compiled from upstream repos (commit SHAs in each page's `
 
 ## buzz
 
-_In progress._
+- [Recommended A2UI integration shape](buzz/a2ui-integration-shape.md): fenced ```a2ui blocks in agent-signed kind:9 messages and canvases, with p-tagged thread-reply actions; PR file lists for desktop and mobile.
+- [Extension points](buzz/extension-points.md): no plugin system; config-nudge sentinel precedent; preview-features gate; canvas seam.
+- [Message model and rich content](buzz/message-model-and-rich-content.md): kind registry; diff kind 40008 traced end to end; canvas/workflow/PR/attachment rendering.
+- [Agent posting and actions](buzz/agent-posting-and-actions.md): buzz-acp + CLI write path, wake kinds, goose's role.
+- [Design system](buzz/design-system.md): Tailwind v4 + shadcn tokens, Flutter theme, mapping to the basic catalog.
+- [Local dev and e2e](buzz/local-dev-and-e2e.md): mock-bridge Playwright template, relay, CLI or scripted fake agent.
+- [Contribution standards](buzz/contribution-standards.md): issue-first, DCO, `just ci`, file-size gate, review-proven rules.
 
 ## comparisons
 
