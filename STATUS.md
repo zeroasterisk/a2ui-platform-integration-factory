@@ -13,5 +13,6 @@
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-03: TS macros confirmed coming upstream in `@a2ui/agent` (~next week). No port; check npm `@a2ui/agent` each run and adopt when released.
 - 2026-11-03: Buzz added as target (fork zeroasterisk/buzz@a2ui); CopilotKit = core team + first-class; README 4 sections.
 - 2026-11-03: repos/forks created; 4 research subagents launched; principles doc (factory = workspace, not dependency).

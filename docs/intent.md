@@ -24,5 +24,5 @@ Let any agent running inside a multi-agent surface (Paseo, then t3code, then oth
 
 ## Open decisions
 1. Paseo: ship as plugin (zero core diff, external repo) vs built-in plugin PR in `plugins/` (upstream review). Default: develop as plugin-example inside the fork, PR as `plugin-examples/a2ui` + optional built-in later.
-2. Macros: Python-only today. Options: (a) port minimal macro expander to TS in our core, (b) run macros as a Python sidecar, (c) upstream TS macros to A2UI. Default: (a) tiny TS expander, propose upstream later.
+2. Macros: **decided**. Don't port. TypeScript macros are coming to `@a2ui/agent` upstream (expected ~mid-Nov 2026). Until they ship, integrations use the basic catalog + Express only and keep a macro slot on the agent side. Macro demos land once upstream releases.
 3. t3code: core PR (new timeline item kind) vs MCP-App bridge (zero t3code diff, iframe, not native). Default: research first.
