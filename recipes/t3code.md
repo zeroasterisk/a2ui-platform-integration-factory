@@ -10,7 +10,7 @@ Applied triage.
 ````
 
 ## Files (web slice 1)
-1. `packages/shared/src/a2uiMessage.ts` (+ `.test.ts`): `splitA2uiSegments(text)` → `[{kind:"markdown"},{kind:"a2ui", source, closed}]`; streaming-safe (an unclosed tag stays markdown/pending); `a2uiActionMessage(action)` serializer. Pure, no deps. Tests: table of complete / unclosed / multiple / adversarial inputs.
+1. `packages/shared/src/a2uiMessage.ts` (+ `.test.ts`): `splitA2uiSegments(text)` → `[{kind:"markdown"},{kind:"a2ui", source, closed}]`; streaming-safe (an unclosed tag → `closed:false`, rendered as a loading skeleton, never raw DSL; tags inside code fences/inline code are ignored; see factory.md fold-in §3); `a2uiActionMessage(action)` serializer. Pure, no deps. Tests: table of complete / unclosed / multiple / adversarial inputs.
 2. `apps/web/src/components/chat/A2uiSurface.tsx`: lazy chunk. `ExpressFormat([catalog]).createParser().parseResponse(...)` → `MessageProcessor` (web_core root) → `@a2ui/react` `A2uiSurface`. Catalog = `Catalog.fromJson(v1 basic JSON)` APIs + `createComponentImplementation` render fns over `components/ui` (Button, Input, Textarea, Checkbox, RadioGroup/toggle-group chips, Switch, Separator, Badge, card classes). Parse/validation error → `MarkdownCodeBlock` fallback.
 3. `ChatMarkdown.tsx` / `TimelineAssistantRows.tsx`: split assistant text before markdown; render segments; pass `ctx.onSendAppMessage` for actions. Keep the ChatMarkdown diff minimal.
 4. `apps/server/scripts/dev-replay/a2ui_transcript.ndjson` + `SCENARIOS` row: turn 1 = triage card; turn 2 (after action) = same surfaceId updated; turn 3 = adversarial fallback.

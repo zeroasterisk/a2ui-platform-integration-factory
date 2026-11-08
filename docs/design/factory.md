@@ -23,3 +23,13 @@
 1. Client compile vs server compile per host (default: client on web/desktop, server on mobile until Hermes is measured).
 2. First host to build: **t3code** (web-only slice, fastest e2e via dev-replay) vs **Paseo** (original ask, needs RN + Docker mock).
 3. Older surfaces after the thread moves on: live or read-only (default: live, with the busy guard).
+
+## Phase 2 review fold-in (Argon, 2026-11-08, `docs/reviews/argon-phase2.md`)
+Binding defaults until Alan overrides them:
+1. **Spike gate before any UI (Phase 2b).** A node/esbuild harness with zod 4 aliased in runs every conformance demo through `ExpressFormat` → `MessageProcessor`. It also does an esbuild metafile check: zero `lit`/`@lit/*` and no `window`/`document`/`customElements` references in the RN bundle, plus bundle size. If zod 4 breaks it, the fix goes upstream in A2UI (`zod/v3` import or migration), not into a host.
+2. **Surface state is per thread, not per row.** One `MessageProcessor` per thread/agent view. A later message with the same `surfaceId` updates that surface. Earlier rows that rendered it collapse to a read-only "updated below" stub, so stale `context` can't be submitted. Message edits re-render in place.
+3. **Splitter contract (shared by every host, written once per host).** Ignore `<a2ui>` inside markdown code fences and inline code. An unclosed tag emits `{kind:"a2ui", closed:false}` and the host shows its loading primitive, never raw DSL. This is under 40 LOC and pure, so principle 5 is **waived** (duplicate it per host). Revisit if `@a2ui/agent` grows a streaming splitter.
+4. **Agent-authored UI limits.** The renderer caps depth (12) and component count (200), past which it falls back to a code block. Links and URL props allow `https:`/`mailto:` only. `Markdown` inside a surface never re-splits `<a2ui>`.
+5. **Action format is taught.** The host's skill snippet appends the ```a2ui-action block schema (surfaceId, name, sourceComponentId, context) under the upstream `SkillGenerator` output. Propose it upstream to `SkillGenerator` later.
+6. **Open decisions:** (1) client compile everywhere, with server/RPC compile only if Hermes fails the spike; (2) **build order: t3code first** (plain Vite web, dev-replay harness), so wire bugs show up apart from RN/plugin issues. Paseo's local mock (Phase 3) runs in parallel. (3) live surfaces, with a busy guard and superseded-surface collapse (item 2).
+7. Paseo e2e adds one native smoke test (Jest/RNTL renderer test) next to Playwright on RN-web.
