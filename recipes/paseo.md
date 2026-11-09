@@ -16,7 +16,7 @@ Applied triage.
 2. `package.json`: private, `dependencies` exact `@a2ui/agent@0.1.0`, `@a2ui/web_core@0.15.0` (bundled by the plugin compiler, like `markdown-panel`'s `@codemirror/*`).
 3. `shared/a2ui.ts`: the Zod schema for the plugin item `{kind:"a2ui", version:1, data:{source, closed, phase}}`, plus `splitA2uiSegments(text)` (same contract as t3code's, factory.md fold-in §3: tags inside code fences ignored, unclosed tag → `closed:false` → host `Loading`) and `a2uiActionMessage(action)`. Pure, no deps.
 4. `index.client.tsx`: `addTimelineTransformer({id:"a2ui", query:{itemType:"assistant_message"}, transform})`. It returns `undefined` when the text has no `<a2ui`, so the host keeps its own row. Otherwise it returns one item per segment: `kind:"a2ui-markdown"` (rendered with host `Markdown` from `@getpaseo/plugin/client/ui`) or `kind:"a2ui"`, with stable `id`s (`<segment index>`). `addTimelineRenderer` for both kinds.
-5. `client/surface.tsx`: compiles with `ExpressFormat([catalog]).createParser().parseResponse(source)` → `MessageProcessor` (web_core root/state/processing subpaths) → RN component map over `react-native` `View`/`Text`/`Pressable` + host `TextInput`, `Icon`, `Markdown`, styled only with `theme.colors.*` from `PluginHostProps` (like `pi-tasks.tsx`). While `phase === "streaming"` and the tag is unclosed, show host `Loading`. On a parse or validation error, render the raw source in a code block.
+5. `client/surface.tsx` (one `MessageProcessor` per agent thread, keyed by agentId; guards from factory.md fold-in §4; the generated skill text gets the `a2ui-action` schema appended, per fold-in §5): compiles with `ExpressFormat([catalog]).createParser().parseResponse(source)` → `MessageProcessor` (web_core root/state/processing subpaths) → RN component map over `react-native` `View`/`Text`/`Pressable` + host `TextInput`, `Icon`, `Markdown`, styled only with `theme.colors.*` from `PluginHostProps` (like `pi-tasks.tsx`). While `phase === "streaming"` and the tag is unclosed, show host `Loading`. On a parse or validation error, render the raw source in a code block.
 6. `client/catalog.tsx`: the basic catalog mapped to RN: Text, Row, Column, Card (`surface1` + `border`), Button (accent only for `primary`, one per surface), TextField, CheckBox, ChoicePicker (chips), Divider, Icon. Mark unsupported components as a visible "unsupported: X" placeholder; never drop them silently.
 7. `a2ui.test.ts`: vitest, colocated like `pi-tasks.test.ts`. A transformer table covering none / complete / unclosed-streaming / two surfaces / adversarial; a compile smoke test for each conformance demo.
 8. `README.md`: in the voice of the other examples (what it recognises, what it renders, no server entry).
@@ -29,6 +29,20 @@ Applied triage.
 ## e2e (Playwright, existing harness)
 `packages/app/e2e/browser/plugin-a2ui-example.spec.ts`, modelled on `viewInlineThinkingExample`:
 `copyPluginExample("a2ui")` → `patchDaemonConfig({pluginsEnabled:true})` → `installDirectoryPlugin` → `seedMockAgentWorkspace({model:"ten-second-stream", featureValues:{mockStreamingAssistantResponse: <demo text>, mockStreamingAssistantIntervalMs: 300}})` → send a prompt → assert the card heading/button render natively (`getByRole`) and `assistant-message` count is 0 for that row → click the button → assert the next user message contains `a2ui-action` → screenshot at widths 1100 and 390. No real model is needed: the mock provider streams the demo text verbatim.
+
+Multi-turn (verified in `mock-load-test-agent.ts:781,917`): `featureValues.mockAssistantResponses: string[]` is shifted one entry per turn (settled, not streamed). Use it for turn 2 (same `surfaceId` after the action) and turn 3 (adversarial). `mockStreamingAssistantResponse` takes precedence on every turn, so the streaming case gets its own test. Slice 2's `a2ui_render` tool call isn't emitted by the mock, so test it by calling the plugin RPC / `timeline.append` from the spec.
+
+Required assertions (Argon phase-3 review):
+1. Streaming: an unclosed `<a2ui>` shows host `Loading`, no raw DSL. A tag inside a code fence stays code.
+2. Native: `getByRole` heading/button/textbox/chips, zero "unsupported: X" for basic-catalog demos, at 1100 and 390.
+3. Action: edit a field, click primary, and the next user message holds a valid `a2ui-action` block with populated `context`.
+4. Update: turn 2 with the same `surfaceId` updates the live surface, and the earlier row collapses to an "updated below" stub (factory.md fold-in §2).
+5. Guards: malformed DSL, depth >12, or >200 components fall back to a source block. Non-`https:`/`mailto:` URLs are neutralised (fold-in §4).
+6. Slice 2: `a2ui_render` updates in place, and "Open in panel" renders it in `a2ui-canvas`.
+
+Native smoke (fold-in §7): one Jest/RNTL render test of `client/surface.tsx` next to `a2ui.test.ts`. Playwright only covers RN-web.
+
+Flake control: warm Metro before Playwright (one `curl` of the web bundle URL with a 300 s budget), so the cold-bundle 120 s `metro-warmup` timeout can't fail the gate.
 
 ## Risks to measure first (before writing UI)
 1. **Bundle in Hermes.** The plugin client bundle is esbuild cjs, es2020, minified, with async lowered. `@a2ui/agent` pulls antlr4ng (~1.45 MB raw / 305 KB gzip in the web spike). Must load in RN Hermes; on web it is fine. If Hermes fails or is too slow, fall back to compiling on the plugin server (`a2ui_compile` RPC) for native only.

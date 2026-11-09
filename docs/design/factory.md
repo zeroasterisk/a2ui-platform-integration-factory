@@ -11,7 +11,7 @@
 ## Per-host first slice (smallest shippable)
 | Host | Slice 1 | Render site / compile | e2e |
 |---|---|---|---|
-| Paseo | `plugin-examples/a2ui`: transformer on `assistant_message` (option B) plus RN renderer | client (RN, measure Hermes) or plugin server via `a2ui_render` tool (option A) | Docker daemon + web UI, Playwright |
+| Paseo | `plugin-examples/a2ui`: transformer on `assistant_message` (option B) plus RN renderer | client (RN, measure Hermes) or plugin server via `a2ui_render` tool (option A) | Paseo's own Playwright harness (isolated daemon + Metro web + `ten-second-stream` mock provider; see docs/local-mock-paseo.md) |
 | t3code | `ChatMarkdown` pre-split + `A2uiSurface` on Base UI | client (web) | dev-replay transcript scenario |
 | Buzz | desktop `A2uiCard` behind preview flag `a2ui` | client (Tauri web) | existing desktop Playwright smoke |
 | CopilotKit | align `@copilotkit/a2ui-renderer` on v1.0 + Express; share conformance demos | partner | their showcase |

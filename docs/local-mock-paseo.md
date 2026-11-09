@@ -3,6 +3,7 @@
 Paseo's own Playwright harness is the local mock. Each test spawns an isolated daemon (temp `PASEO_HOME`), Metro web, and a mock agent (`ten-second-stream` provider streams fixture text verbatim). No API keys, no Docker.
 
 ## Bring-up (fork `a2ui` branch, Node 22)
+0. Check `command -v ps`. You need procps, because the daemon shells out to `ps`.
 1. `npm ci` (set `ELECTRON_SKIP_BINARY_DOWNLOAD=1 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`). ~4 min, 2.9 GB `node_modules`.
 2. `npm run build:server`. This builds client/highlight/plugin/relay, server, and `packages/cli/dist` (the e2e teardown calls `cli/dist/index.js daemon stop`).
 3. `npx playwright install chromium-headless-shell` (Playwright 1.58.2 → revision 1208).
