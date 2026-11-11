@@ -8,12 +8,13 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 done + Argon review; A+B fixed; next C, splitA2uiSegments hardening, lit-free catalog | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 done + Argon review; A+B+C fixed; next splitA2uiSegments hardening, lit-free catalog | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-11 (2): Fixed C on `zeroasterisk/t3code@a2ui` `66632e73`. The action message now reads heading + summary (`pr415: revert · note: ship it`). The summary truncates values to 40 chars, caps at 6 fields and escapes markdown. ChatMarkdown renders the `a2ui-action` fence as a collapsed "Action payload" disclosure (host `MarkdownDetails`). The fence text is unchanged, so the agent payload is identical. The user doc got one line. Measured: shared tests 14/14, browser tests 18/18 (ChatMarkdown + A2uiBlock, including a new disclosure test), web+shared `tsc` clean, hooks (fmt, lint, knip) pass. Not yet re-shot at 412 px; that comes with the slice-1 close CUJ. `@a2ui/agent` is still 0.1.0. Next: harden `splitA2uiSegments` (mixed fences, `</a2ui>` in strings, `<a2ui>` + trailing text).
 - 2026-11-11: Argon phase-5 slice-1 review (`docs/reviews/argon-phase5-slice1.md`). Verdict: no slice 2 until the following are fixed:
   - Critical: `A2uiBlock` rebuilt the MessageProcessor on every render. That is the root cause of A: `setSent` reset the edited data model.
   - Major: the `/catalogs/basic/v1` import (lit).
