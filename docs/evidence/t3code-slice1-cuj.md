@@ -16,3 +16,15 @@ Vision findings (fix list for slice 1 review):
 - E. A small stray glyph sits in the left gutter near messages. Not yet attributed (likely stock chrome); check before fixing.
 
 Harness note: on mobile, t3code collapses the composer when it is unfocused (`isComposerCollapsedMobile`). That is stock behaviour, not ours. The CUJ taps the "Ask anything..." row to expand it.
+
+## Slice-1 close re-shoot (2026-11-12)
+
+Fork `zeroasterisk/t3code@a2ui` `11f0ddf3`. Same journey and harness (stock `vp run dev`, pairing link, `Interactive reply` dev-replay). GIFs above were replaced in place; the 2026-11-10 versions are in git history.
+
+Measured at 1100 and 412 px: 3/3 turns render, `main iframe` 0, 0 page errors. DOM checks after Apply:
+- A fixed: the locked note field still holds `Reverting 415, see thread`; checkbox stays checked.
+- B fixed: the surface wrapper is `inert` and now visibly dimmed. The re-shoot showed the old wrapper was `display: contents`, so its opacity painted nothing; fixed in `11f0ddf3` with a browser assertion that fails on the old class.
+- C fixed: the user bubble reads `pr412: retry · pr415: revert · pr419: retry · notify: yes · note: …`, wraps at word boundaries on mobile, payload behind a collapsed "Action payload" disclosure.
+- D deferred to slice 2 (segmented control). E dropped (stock chrome).
+
+Vision (412 px, after fix): form dimmed (subtle; host disabled token), note kept, summary clean, no clipping or overlap.

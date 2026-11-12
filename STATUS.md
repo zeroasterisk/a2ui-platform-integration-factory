@@ -8,12 +8,19 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 done + Argon review; A+B+C + splitter hardening fixed; next slice-1 close CUJ (lit-free catalog waits on upstream) | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed (Argon fixes A–C + splitter verified in re-shot CUJ; lit-free catalog waits on upstream); next: slice-2 plan (canvas / same-surface update, D) | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-12: Slice-1 close. Re-shot the CUJ at 1100 and 412 px (`docs/evidence/t3code-a2ui-slice1-cuj-*.gif`, notes in `t3code-slice1-cuj.md`). Measured at both widths: 3/3 turns, 0 iframes, 0 page errors.
+  - DOM checks after Apply: the note is kept (A) and the bubble shows the one-line summary (C).
+  - The re-shoot caught a residual B: the form was inert but looked live, because the lock wrapper was `display: contents` (its opacity painted nothing). Fixed on `zeroasterisk/t3code@a2ui` `11f0ddf3`: the wrapper is a flex box with host `opacity-64`. The browser test asserts a box and opacity < 1; it failed on the old class and passes on the new one (3/3).
+  - web `tsc` clean, hooks (fmt, lint, knip) pass. Vision at 412 px: dimmed, note kept, no clipping.
+  - Ops: the dev server needs the pairing URL from its log (`pair#token=…`, one-time). A stale server from an old run blocked startup until it was killed.
+  - `@a2ui/agent` is still 0.1.0.
+  - Next: the slice-2 plan (canvas / same-surface update, D segmented choice), then the Argon review.
 - 2026-11-11 (3): Hardened `splitA2uiSegments` (Argon Major) on `zeroasterisk/t3code@a2ui` `36527303`. Three fixes:
   - Fences pair by character and length, as in CommonMark, so `~~~` inside a ``` fence or ``` inside a ```` fence stays code.
   - A line starting `<a2ui>` may carry source after the tag.
