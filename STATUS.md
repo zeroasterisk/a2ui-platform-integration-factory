@@ -8,12 +8,16 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); next: D (segmented ChoicePicker), then 2a thread store | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); next: 2a thread store | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-12 (3): Landed D (segmented choice) on `zeroasterisk/t3code@a2ui` `ae876f91`. A `ChoicePicker` that is `mutuallyExclusive`, has ≤4 options and labels ≤16 chars now renders as the host `ToggleGroup`, the same control `DiffPanel` and `CustomSnoozeDialog` use. Longer lists keep the radio group. Pressing the selected option again keeps it selected.
+  - New browser test: toggle group present, 2 toggles, no radios, and the press sticks. It fails on the old catalog and passes on the new one. Chat browser suite 148/148, web `tsc` clean, hooks (fmt, lint, knip) pass.
+  - Not yet re-shot at 412 px; that comes with the 2a CUJ. `@a2ui/agent` is still 0.1.0.
+  - Next: 2a.1–2a.5, the derived, observable thread store (`a2uiThread.ts`) plus "Updated below", in one commit.
 - 2026-11-12 (2): Wrote the slice-2 plan (`docs/plans/t3code-slice2.md`): 2a same-surface updates in the timeline, 2b an "Open in panel" right-panel kind.
   - Precondition spike `spikes/zod4-rn/same-surface.mjs`, run on `@a2ui/agent@0.1.0`. One processor + `RendererState.of(proc)` across turns: turn 2 `surface("triage", update=true)` emits only `updateComponents` onto the same `SurfaceModel`, and the new text renders. This also works with `wrapped:false`.
   - Without state, turn 2 is rejected (`Surface not found`). A bare `surface("triage")` on turn 2 is also rejected (`already exists`). Upstream `EXPRESS_RULES` doesn't teach `update=true`, so the host snippet must, and it's a new upstream ask (added to NEEDS_ALAN #2).
