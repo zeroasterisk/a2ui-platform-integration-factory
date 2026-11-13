@@ -8,12 +8,19 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); next: Argon review of 2a, then 2b | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); next: 2b "Open in panel" | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-13 (3): Argon reviewed 2a (`docs/reviews/argon-phase5-slice2a.md`): yes for 2b, with two Majors.
+  - Major 1 (a multi-part block partly applied, then failing): refuted by `spikes/zod4-rn/multipart.mjs`. In both orders, and for a runtime failure, the block is rejected with 0 parts applied. Triage stays `t1` and no stray surface appears. The control (a valid 2-surface block) applies both.
+  - Major 2 (closed blocks inside a still-streaming reply were left out of the thread store, so they showed Pending): confirmed and fixed on `zeroasterisk/t3code@a2ui` `496f6f3a` by dropping the `streaming` filter.
+  - Minor 4: a new lock test (replay keeps the surface locked, a fresh `update=true` unlocks it). It kills the mutant (with `fresh` forced true it fails).
+  - Measured: chat browser suite 37 files / 155 tests pass, web `tsc` clean, hooks (fmt, lint, knip) pass.
+  - Minor 3 (per-surface footer) is deferred to 2b. `@a2ui/agent` is still 0.1.0.
+  - Next: 2b.1, the `a2ui` right-panel kind (not persisted) + "Open in panel".
 - 2026-11-13 (2): Ran the 2a CUJ. The 2a gate is met at 1100 and 412 px; GIFs in `docs/evidence/t3code-a2ui-slice2a-cuj-*.gif`, notes in `t3code-slice2a-cuj.md`.
   - Landed on `zeroasterisk/t3code@a2ui` `037aceb5`. In the dev replay, turn 1 is now `surface("triage")` and turn 2 is `surface("triage", update=true)`, which closes the Argon Minor and plan item 5. The dev-replay test asserts both lines (14/14). The user doc got one paragraph on the update line (plan item 7). Hooks (fmt, lint, knip) pass.
   - Measured at both widths after turn 2: 1 superseded stub, 1 live surface, 0 "Apply triage" buttons, 0 iframes, 0 page errors. Vision at 412 px: "updated below" sits where the form was, with no duplicate and no clipping.
