@@ -8,12 +8,18 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); next: 2a CUJ at 412 px + Argon review | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); next: Argon review of 2a, then 2b | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-13 (2): Ran the 2a CUJ. The 2a gate is met at 1100 and 412 px; GIFs in `docs/evidence/t3code-a2ui-slice2a-cuj-*.gif`, notes in `t3code-slice2a-cuj.md`.
+  - Landed on `zeroasterisk/t3code@a2ui` `037aceb5`. In the dev replay, turn 1 is now `surface("triage")` and turn 2 is `surface("triage", update=true)`, which closes the Argon Minor and plan item 5. The dev-replay test asserts both lines (14/14). The user doc got one paragraph on the update line (plan item 7). Hooks (fmt, lint, knip) pass.
+  - Measured at both widths after turn 2: 1 superseded stub, 1 live surface, 0 "Apply triage" buttons, 0 iframes, 0 page errors. Vision at 412 px: "updated below" sits where the form was, with no duplicate and no clipping.
+  - Ops: the log's pairing link now 401s. Use `node src/bin.ts auth pairing create --dev-url http://localhost:5733` instead (`cuj/pair.py`). A stale `src/bin.ts` still blocks startup until it's killed.
+  - `@a2ui/agent` is still 0.1.0.
+  - Next: the Argon review of 2a (thread store + CUJ), then 2b ("Open in panel").
 - 2026-11-13: Landed 2a.1–2a.5 on `zeroasterisk/t3code@a2ui` `7273322d`. New `a2uiThread.ts`: one `MessageProcessor` + `RendererState` per thread (LRU 8). Closed blocks apply in order, so `surface("id", update=true)` in a later reply updates an earlier reply's surface. The earlier block shows "Interactive reply updated below"; one live copy stays editable. Blocks without `surface()` get `a2ui-<msgId>:<offset>`. An edited, regenerated or truncated earlier block triggers a full replay. A fresh agent reply unlocks the surface it updates; a replay doesn't.
   - Precondition spike `spikes/zod4-rn/atomic.mjs` (measured): bare blocks default to `main`, so a second bare block fails "already exists" (hence the per-block id); a catalog-violating update throws and leaves the surface unchanged; an update to an unknown surface throws.
   - Tests: new `a2uiThread.browser.test.ts` 5/5, plus an A2uiBlock thread-update case; chat browser suite 621 tests, 618 pass on the first run. The 3 failures: two from a React Compiler memo bug in my first cut (the block never re-rendered on store change; fixed by threading the store version through `store.view()`), one flaky `MessagesTimeline` height test that passed 40/40 twice on re-run. Web `tsc` clean, hooks (fmt, lint, knip) pass. Shared `a2uiMessage` 20/20.
