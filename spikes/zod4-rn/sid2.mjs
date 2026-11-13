@@ -1,0 +1,14 @@
+import { ExpressFormat, RendererState } from '@a2ui/agent';
+import { MessageProcessor } from '@a2ui/web_core';
+import { basicCatalog } from '@a2ui/web_core/v1_0';
+let acts=[];
+const proc = new MessageProcessor([basicCatalog], (a) => acts.push(a));
+const state = RendererState.of(proc);
+const p = (sid) => new ExpressFormat([basicCatalog], {surfaceId: sid}).createParser();
+const ids = (parts) => parts.filter(p=>p.type==='a2ui').flatMap(p=>p.a2ui.map(m=>{const k=Object.keys(m).find(k=>k!=='version');return k+':'+m[k].surfaceId}));
+console.log(ids(p('b0').parseResponse('root = Column([Text("a")])', {state, wrapped:false})));
+console.log(ids(p('b1').parseResponse('root = Column([Text("b")])', {state, wrapped:false})));
+console.log(ids(p('b2').parseResponse('surface("triage")\nroot = Button(Text("go"), action=Event("go", {x: 1}))', {state, wrapped:false})));
+console.log(ids(p('b3').parseResponse('surface("triage", update=true)\nroot = Text("done")', {state, wrapped:false})));
+console.log([...proc.model.surfacesMap.keys()]);
+const t0=performance.now(); for(let i=0;i<20;i++) p('x'+i); console.log('ms/parser', ((performance.now()-t0)/20).toFixed(2));
