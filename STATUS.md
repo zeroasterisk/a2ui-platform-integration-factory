@@ -19,14 +19,14 @@
   - Panel: the new `A2uiPanel` reads the same thread store and `SurfaceModel`.
   - Persistence: the kind is kept out of `open`/`singletonSurface`, stripped in `partialize` + `migratePersisted`, and added to the closed-view skip. `reopenClosedView.ts` still needed one exhaustive case (`return false`), which tsc required.
   - Argon Minor 3 is folded: the "Sent"/"failed" footer is now per surface.
-  - Diff: ~66 host lines outside new files, under the ~80 stop line.
+  - Diff: 144 host lines added outside new files and tests (A2uiBlock 76, store 43). That is over the plan's ~80 stop line. Most of it is the per-surface footer and stub in `A2uiBlock`. Per the plan, Argon should check for a smaller seam before the CUJ.
   - Measured:
     - store unit tests 72/72: 3 new (one tab per surface + refocus, dropped on reload, never recorded as a closed view);
     - chat browser suite 37 files / 156 tests, including a new one: open in panel → timeline stub + exactly one live copy, in the panel;
     - web `tsc` clean;
     - hooks (fmt, lint, knip) pass.
   - Not yet covered: the plan's "edit in the panel → action sends the same `a2ui-action`" test, and the CUJ at 1100/412 px. Visual change, so it needs planner review at the CUJ. `@a2ui/agent` is still 0.1.0.
-  - Next: the 2b panel edit/action browser test, then the 2b CUJ.
+  - Next: an Argon seam review of the 2b.1 diff (it is over budget), then the panel edit/action browser test, then the 2b CUJ.
 - 2026-11-13 (3): Argon reviewed 2a (`docs/reviews/argon-phase5-slice2a.md`): yes for 2b, with two Majors.
   - Major 1 (a multi-part block partly applied, then failing): refuted by `spikes/zod4-rn/multipart.mjs`. In both orders, and for a runtime failure, the block is rejected with 0 parts applied. Triage stays `t1` and no stray surface appears. The control (a valid 2-surface block) applies both.
   - Major 2 (closed blocks inside a still-streaming reply were left out of the thread store, so they showed Pending): confirmed and fixed on `zeroasterisk/t3code@a2ui` `496f6f3a` by dropping the `streaming` filter.
