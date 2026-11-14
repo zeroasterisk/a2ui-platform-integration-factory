@@ -51,3 +51,13 @@ Binding changes:
 6. **Panel payload carries the thread**: `{id: "a2ui:<threadKey>:<surfaceId>", kind: "a2ui", threadKey, surfaceId}`, because side-chats route to the host panel (Minor).
 7. **Action routing**: the thread store holds a mutable ref to the thread's `onSendAppMessage`. `onAction` sets `sentBySurfaceId[action.surfaceId]`.
 8. **Reorder**: D (segmented `ChoicePicker`) lands first as its own commit, then 2a.1–2a.5.
+
+## Argon 2b.1 seam review fold-in (2026-11-14, `docs/reviews/argon-phase5-slice2b1.md`, cut seam before CUJ)
+Verified before folding: `git diff --numstat 496f6f3a 8b9d0c01` gives upstream host files RightPanelTabs 5, RightPanelSurfaceContent 7, reopenClosedView 3, rightPanelStore 43 = **58 added lines** (under the ~80 stop line, over the ~40 target). A2uiBlock (76) and a2uiThread (10) are our own slice-1/2a files, so the 144 figure overcounted. `a2uiThread.setSendMessage(undefined)` already clears the sender, so Argon Minor 3 is already handled.
+
+Binding changes before the 2b CUJ:
+9. **Seam A**: move the per-surface row (panel stub, "Open in panel" button, `inert` wrapper, per-surface Sent/failed footer) and the panel selector/open plumbing out of `A2uiBlock.tsx` into a new `A2uiSurfaceRow` (+ `A2uiSentNotice`) shared with `A2uiPanel`. This removes the duplicated lock wrapper and footer.
+10. **Seam B**: compact `withoutA2uiSurfaces` in `rightPanelStore.ts` to an inline filter in `partialize`/migrate. Keep it in the store: never import chat components into the root store. Target ≤45 upstream host lines.
+11. **Seam C** (reuse `side-chat`/`preview` kind): rejected. It would pollute closed-view history and tab chrome.
+12. **Test owed**: edit in the panel → close the panel → the timeline shows the edit; an action from the panel → `onSendMessage` gets the same `a2ui-action` with the edited value.
+13. Minor: `new Set(inPanelIds ? inPanelIds.split("\n") : [])`, so an empty selector doesn't yield `{""}`.

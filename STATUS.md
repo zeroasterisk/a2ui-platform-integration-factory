@@ -8,12 +8,23 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); next: 2b panel edit/action test, then 2b CUJ | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); next: seam A+B refactor + panel edit/action test, then 2b CUJ | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-14 (2): Argon reviewed the 2b.1 seam (`docs/reviews/argon-phase5-slice2b1.md`). Verdict: cut the seam before the 2b CUJ.
+  - Correction, re-measured with `git diff --numstat 496f6f3a 8b9d0c01`: upstream host files add 58 lines (rightPanelStore 43, RightPanelSurfaceContent 7, RightPanelTabs 5, reopenClosedView 3). That is under the ~80 stop line. The 144 figure counted our own `A2uiBlock` (76) and `a2uiThread` (10).
+  - Folded as plan items 9–13:
+    - Seam A: extract `A2uiSurfaceRow` + `A2uiSentNotice`, shared with `A2uiPanel`. Est. −65 lines in A2uiBlock, and the duplicate lock wrapper/footer goes away.
+    - Seam B: inline `withoutA2uiSurfaces` in the store, target ≤45 host lines.
+    - Seam C (reuse an existing kind): rejected.
+    - The owed panel edit → restore + action test.
+    - The empty-split Minor.
+  - Argon Minor 3 (stale `sendMessage`) checked and already handled: `setSendMessage(undefined)` clears it.
+  - `@a2ui/agent` is still 0.1.0.
+  - Next: seam A+B refactor and the panel edit/action browser test in one fork commit, then the 2b CUJ at 1100/412.
 - 2026-11-14: 2b.1 landed on `zeroasterisk/t3code@a2ui` `8b9d0c01`. It adds a new in-memory right-panel kind, `{id: "a2ui:<threadKey>:<surfaceId>", kind: "a2ui", threadKey, surfaceId}`, plus `openA2uiSurface`.
   - Timeline: each live surface gets a ghost icon button, "Open in panel". When the panel holds the surface, the timeline row turns into "Interactive reply open in panel · Show", so only one live copy stays interactive.
   - Panel: the new `A2uiPanel` reads the same thread store and `SurfaceModel`.
