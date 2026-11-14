@@ -8,12 +8,25 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); next: 2b "Open in panel" | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); next: 2b panel edit/action test, then 2b CUJ | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-14: 2b.1 landed on `zeroasterisk/t3code@a2ui` `8b9d0c01`. It adds a new in-memory right-panel kind, `{id: "a2ui:<threadKey>:<surfaceId>", kind: "a2ui", threadKey, surfaceId}`, plus `openA2uiSurface`.
+  - Timeline: each live surface gets a ghost icon button, "Open in panel". When the panel holds the surface, the timeline row turns into "Interactive reply open in panel · Show", so only one live copy stays interactive.
+  - Panel: the new `A2uiPanel` reads the same thread store and `SurfaceModel`.
+  - Persistence: the kind is kept out of `open`/`singletonSurface`, stripped in `partialize` + `migratePersisted`, and added to the closed-view skip. `reopenClosedView.ts` still needed one exhaustive case (`return false`), which tsc required.
+  - Argon Minor 3 is folded: the "Sent"/"failed" footer is now per surface.
+  - Diff: ~66 host lines outside new files, under the ~80 stop line.
+  - Measured:
+    - store unit tests 72/72: 3 new (one tab per surface + refocus, dropped on reload, never recorded as a closed view);
+    - chat browser suite 37 files / 156 tests, including a new one: open in panel → timeline stub + exactly one live copy, in the panel;
+    - web `tsc` clean;
+    - hooks (fmt, lint, knip) pass.
+  - Not yet covered: the plan's "edit in the panel → action sends the same `a2ui-action`" test, and the CUJ at 1100/412 px. Visual change, so it needs planner review at the CUJ. `@a2ui/agent` is still 0.1.0.
+  - Next: the 2b panel edit/action browser test, then the 2b CUJ.
 - 2026-11-13 (3): Argon reviewed 2a (`docs/reviews/argon-phase5-slice2a.md`): yes for 2b, with two Majors.
   - Major 1 (a multi-part block partly applied, then failing): refuted by `spikes/zod4-rn/multipart.mjs`. In both orders, and for a runtime failure, the block is rejected with 0 parts applied. Triage stays `t1` and no stray surface appears. The control (a valid 2-surface block) applies both.
   - Major 2 (closed blocks inside a still-streaming reply were left out of the thread store, so they showed Pending): confirmed and fixed on `zeroasterisk/t3code@a2ui` `496f6f3a` by dropping the `streaming` filter.
