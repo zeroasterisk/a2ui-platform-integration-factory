@@ -8,12 +8,20 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); next: seam A+B refactor + panel edit/action test, then 2b CUJ | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); next: 2b CUJ at 1100/412 | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-14 (3): Seam A+B and the owed panel test landed on `zeroasterisk/t3code@a2ui` `8dba076b` (plan items 9, 10, 12, 13).
+  - Seam A: new `A2uiSurfaceRow.tsx` holds `useA2uiPanel` (panel selector + open), `A2uiSurfaceRow` (stub / "Open in panel" / surface) and `A2uiLockedSurface` (inert lock + Sent/failed notice). `A2uiPanel` reuses `A2uiLockedSurface`, so the duplicate lock wrapper and footer are gone.
+  - Item 13 folded: an empty selector now yields an empty set.
+  - Seam B: `withoutA2uiSurfaces` is inlined in `partialize`. That is no line saving (store still +43 / −8); the ≤45 host-line target is missed. Upstream host files total 58 lines (store 43, RightPanelSurfaceContent 7, RightPanelTabs 5, reopenClosedView 3). That is under the ~80 stop line, so we accept it.
+  - Diff vs `496f6f3a` (`git diff --numstat`): `A2uiBlock.tsx` is now +16/−20, down from +76. The new file adds 102 lines.
+  - New browser test: edit in the panel, close it, and the timeline shows the edit. Reopen, press Apply in the panel, and `onSendMessage` gets `Apply` with `"surfaceId":"f"` and `"context":{"choice":["revert"]}`. The panel then shows "Sent to the agent".
+  - Measured: A2uiBlock 7/7; chat browser suite 41 files / 179 tests; store unit 72/72; web `tsc` clean; hooks (fmt, lint, knip) pass. `@a2ui/agent` is still 0.1.0.
+  - Next: the 2b CUJ at 1100/412 px. It is a visual change, so it needs a planner/vision review.
 - 2026-11-14 (2): Argon reviewed the 2b.1 seam (`docs/reviews/argon-phase5-slice2b1.md`). Verdict: cut the seam before the 2b CUJ.
   - Correction, re-measured with `git diff --numstat 496f6f3a 8b9d0c01`: upstream host files add 58 lines (rightPanelStore 43, RightPanelSurfaceContent 7, RightPanelTabs 5, reopenClosedView 3). That is under the ~80 stop line. The 144 figure counted our own `A2uiBlock` (76) and `a2uiThread` (10).
   - Folded as plan items 9–13:
