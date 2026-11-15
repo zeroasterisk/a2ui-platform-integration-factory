@@ -8,12 +8,19 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); next: 2b CUJ at 1100/412 | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ▶️ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); 2b CUJ green at 1100/412 (`docs/evidence/t3code-slice2b-cuj.md`); next: phase-5 close review | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-15: Ran the 2b CUJ on fork `8dba076b`. The gate is met at 1100 and 412 px: GIFs in `docs/evidence/t3code-a2ui-slice2b-cuj-*.gif`, notes in `t3code-slice2b-cuj.md`.
+  - Flow: open in panel → edit there → Apply → turn 2 updates the panel. At 412 px the panel is a sheet.
+  - Measured at both widths, identical: one live copy (panel 1, timeline stub 1, Apply buttons 1). After Apply: "Sent to the agent", the panel locked, and the action line carries the panel edits. After turn 2: "Triage applied" in the panel, turn 1 superseded, Apply buttons 0. 0 iframes, 0 page errors.
+  - Vision at 412 px: the open button is placed cleanly, the sheet shows the full form, and the applied card is unclipped. The stock star-on-GitHub toast covered the panel top, so the CUJ dismisses it.
+  - Minors for the close review: turn 1 "updated below" while the copy is in the panel, and "Show" still rendered while the tab is active.
+  - `@a2ui/agent` is still 0.1.0.
+  - Next: phase-5 close review (Argon) of slices 1–2b.
 - 2026-11-14 (3): Seam A+B and the owed panel test landed on `zeroasterisk/t3code@a2ui` `8dba076b` (plan items 9, 10, 12, 13).
   - Seam A: new `A2uiSurfaceRow.tsx` holds `useA2uiPanel` (panel selector + open), `A2uiSurfaceRow` (stub / "Open in panel" / surface) and `A2uiLockedSurface` (inert lock + Sent/failed notice). `A2uiPanel` reuses `A2uiLockedSurface`, so the duplicate lock wrapper and footer are gone.
   - Item 13 folded: an empty selector now yields an empty set.
