@@ -8,12 +8,23 @@
 | 2b. Dependency spike: zod-4-aliased harness runs conformance demos via ExpressFormat→MessageProcessor; RN bundle has no lit/DOM; size measured | ✅ (Paseo blocked on upstream zod fix; Metro/Hermes still open) | harness output in `spikes/zod4-rn/` |
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
-| 5. t3code integration (built first, per factory.md fold-in §6) | ✅ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); 2b CUJ green at 1100/412 (`docs/evidence/t3code-slice2b-cuj.md`); ✅ closed by Argon close review (`docs/reviews/argon-phase5-close.md`, 0 Critical/Major); carry-over minors P5.1–P5.4 below | same bar |
+| 5. t3code integration (built first, per factory.md fold-in §6) | ✅ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); 2b CUJ green at 1100/412 (`docs/evidence/t3code-slice2b-cuj.md`); ✅ closed by Argon close review (`docs/reviews/argon-phase5-close.md`, 0 Critical/Major); carry-over minors P5.1–P5.3 landed (fork `eeb2c3ec`), P5.4 deferred to Phase 6 | same bar |
 | 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-15 (3): P5.1–P5.3 landed on `zeroasterisk/t3code@a2ui` `eeb2c3ec`.
+  - P5.1: `MessagesTimeline` mounts a lazy `A2uiThreadSync`, which syncs the thread's closed blocks in a layout effect. The panel now finds its surface even when no timeline row is mounted. `A2uiBlock` no longer syncs during render, `queueMicrotask` is gone, and a standalone block builds its own store once. `a2uiBlocks` moved out of the row context.
+  - P5.2: the stub hides "Show" while the open panel's active tab is that surface.
+  - P5.3: one sentence on "Open in panel" in `html-renders.md`.
+  - Two new browser tests:
+    - The panel renders "panel only" with just the sync and the panel mounted, with no "no longer in memory".
+    - "Show" is absent while the surface is shown and appears once another tab is active. The mutant (Show always rendered) fails it.
+  - Measured: chat browser suite 37 files / 159 tests pass, web `tsc` clean, hooks (fmt, lint, knip) pass.
+  - Host diff: `MessagesTimeline` is +23/−9 vs the previous commit (lazy import + mount). In return, `timelineRowContext` −3 and `TimelineAssistantRows` −1.
+  - P5.4 (`isEphemeralSurface`) is deferred to Phase 6 recipe prep. `@a2ui/agent` is still 0.1.0.
+  - Next: Phase 5b, Buzz research → recipe.
 - 2026-11-15 (2): Argon phase-5 close review (`docs/reviews/argon-phase5-close.md`) of the full fork diff vs upstream base (89 KB, lockfile excluded), the recipe, the slice-2 plan and three CUJ notes. Verdict: close Phase 5 now; 0 Critical, 0 Major, 0 must-fix. Phase 5 is ✅.
   - Checked by hand before folding:
     - The doc-drift claim that "on mobile the reply shows as text" contradicts the 412 px CUJs is refuted. That line means the native `apps/mobile` app, which has no A2UI code (grep: 0 source hits). The 412 px CUJs are web.
