@@ -16,7 +16,7 @@ Applied triage.
 ## Trust gate (by construction)
 `registerMessage` gets the whole `ChannelMessage`. Match only when all of these hold:
 - the body contains `<a2ui`;
-- `message.agentEnvelope`, the author is in `useKnownAgentPubkeys`, or the author's profile has `isAgent`. This is the same predicate `MessageRow.tsx:399-402` uses for the agent squircle;
+- `message.agentEnvelope`, the author is in `useKnownAgentPubkeys`, or the author's profile has `isAgent`. This is the same predicate `MessageRow.tsx:467` uses for the agent squircle (was `:399-402` at `3fca452`; moved at fork base `f307d59`);
 - there is no `workflowOwnerId`.
 
 Human-authored `<a2ui>` text stays plain text. `registerCodeBlock` is not used, because it gets only `{code, language}` and so cannot see the author.
@@ -45,7 +45,10 @@ Human-authored `<a2ui>` text stays plain text. `registerCodeBlock` is not used, 
    - the dark color mode uses theme tokens.
    The action round-trip (`messages.reply` called with the p-tag and the edited `context`) goes in a Vitest component test with a fake session, like `DiffMessage.test.tsx`.
 
-Deps (exact): `@a2ui/agent@0.1.0`, `@a2ui/web_core@0.15.0`, `@a2ui/react@0.15.0`. buzz-app has no direct zod. Its only zod is 3.25.76, so web_core's zod ^3 should dedupe onto it. **Verify** with `pnpm why zod` and the conformance demos after install (NEEDS_ALAN #2 is a zod-4 blocker; it shouldn't apply here).
+Deps (exact): `@a2ui/agent@0.1.0`, `@a2ui/web_core@0.15.0`, `@a2ui/react@0.15.0`. buzz-app has no direct zod. At `f307d59` it carries zod 3.25.76 (tauri-mcp-server) and 4.6.5 (`@modelcontextprotocol/server`). **Verified** on fork `87cb992` (base `f307d59`):
+- `pnpm why zod`: `web_core` and `agent` resolve zod 3.25.76.
+- `@a2ui/react` resolves the host's zod 4.6.5 (its zod is a peer dep, and `@modelcontextprotocol/server` brings 4). It has 0 runtime zod imports, so this is types-only and harmless. `pnpm peers check` flags the mismatch (and markdown-it wanting web_core ^0.14). That's noise, not a blocker.
+- Conformance harness run in-tree with buzz-app's own resolution matches the zod-3 baseline exactly: compile 115/121, MessageProcessor 0 errors over 64 cases, `parseResponse` 68/72. NEEDS_ALAN #2 does not block Buzz.
 
 ## Prompt budget (measured, `spikes/zod4-rn/prompt-budget.mjs`)
 `addInstructions` throws on more than 4096 UTF-8 bytes and is sent on every turn.

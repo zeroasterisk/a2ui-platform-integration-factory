@@ -9,11 +9,18 @@
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
 | 5. t3code integration (built first, per factory.md fold-in §6) | ✅ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); 2b CUJ green at 1100/412 (`docs/evidence/t3code-slice2b-cuj.md`); ✅ closed by Argon close review (`docs/reviews/argon-phase5-close.md`, 0 Critical/Major); carry-over minors P5.1–P5.3 landed (fork `eeb2c3ec`), P5.4 deferred to Phase 6 | same bar |
-| 5b. Buzz integration (research → recipe → `a2ui` branch) | ▶️ research refreshed (`wiki/buzz/buzz-app-plugin-shape.md`); recipe `recipes/buzz.md` written + prompt budget measured; next: fork `zeroasterisk/buzz-app`, slice 1 deps/zod check | same bar |
+| 5b. Buzz integration (research → recipe → `a2ui` branch) | ▶️ research refreshed (`wiki/buzz/buzz-app-plugin-shape.md`); recipe `recipes/buzz.md` written + prompt budget measured; fork `zeroasterisk/buzz-app@a2ui` deps landed (`87cb992`), zod/conformance verified (risk 1 closed); next: slice 1 task 3 (`a2uiMessage.ts` + tests) | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-16 (3): Forked `block/buzz-app` → `zeroasterisk/buzz-app`, branch `a2ui` off upstream `f307d59` (6 commits past the recipe's `3fca452`). `origin` push is disabled; pushes go to `fork`. Landed `87cb992`: exact deps `@a2ui/agent@0.1.0`, `@a2ui/web_core@0.15.0`, `@a2ui/react@0.15.0` (package.json +3, lockfile +216). Recipe risk 1 is closed:
+  - `pnpm why zod`: web_core and agent resolve zod 3.25.76. The recipe's "only zod is 3.25.76" was stale: `@modelcontextprotocol/server` brings zod 4.6.5, and `@a2ui/react`'s zod peer binds to it. `@a2ui/react` has 0 runtime zod imports (only `.d.ts`), so this is harmless. `pnpm peers check` warnings are noise.
+  - The conformance harness (`spikes/zod4-rn/harness.mjs`, run unbundled inside buzz-app's node_modules) gives compile 115/121, MessageProcessor 0 errors / 64 cases, `parseResponse` 68/72. That is identical to the zod-3 baseline, so NEEDS_ALAN #2 does not block Buzz.
+  - Seams re-checked at `f307d59`: the agent predicate moved to `MessageRow.tsx:467` (recipe updated); `ResolvePull.tsx:130-131` and the `registerMessage` matchers (diffs, huddles) are unchanged.
+  - Ops: buzz-app needs node ≥24, so use `~/agent/tools/node-26.12.1-linux-x64/bin`. `pnpm install --frozen-lockfile --ignore-scripts` takes ~1 min.
+  - `@a2ui/agent` is still 0.1.0, and a2ui `main` has no macro commits (`57f961f1`).
+  - Next: slice 1 task 3, porting `a2uiMessage.ts` + tests from t3code into `src/bundled/a2ui/`, then `pnpm check`.
 - 2026-11-16 (2): Wrote `recipes/buzz.md` (buzz-app `3fca452`, the plugin seams are unchanged since `ff8415d`).
   - One bundled plugin, `src/bundled/a2ui/`. Chat rendering uses `registerMessage`, gated on the agent predicate from `MessageRow.tsx:399-402` (agentEnvelope / known agent / `isAgent`), so trust holds by construction.
   - Actions go back via `session.messages.reply(channelId, root, text, [author])`, the same call `github/ResolvePull.tsx:130` makes.
