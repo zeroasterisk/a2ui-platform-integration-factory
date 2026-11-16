@@ -54,6 +54,7 @@ Source-verified notes compiled from upstream repos (commit SHAs in each page's `
 
 ## buzz
 
+- [Buzz 1.0 plugin shape](buzz/buzz-app-plugin-shape.md): desktop moved to block/buzz-app, which has a plugin API (registerCodeBlock/registerMessage/addInstructions/addTool); A2UI as a no-core-diff plugin; replaces desktop PR 1. Read first.
 - [Recommended A2UI integration shape](buzz/a2ui-integration-shape.md): fenced ```a2ui blocks in agent-signed kind:9 messages and canvases, with p-tagged thread-reply actions; PR file lists for desktop and mobile.
 - [Extension points](buzz/extension-points.md): no plugin system; config-nudge sentinel precedent; preview-features gate; canvas seam.
 - [Message model and rich content](buzz/message-model-and-rich-content.md): kind registry; diff kind 40008 traced end to end; canvas/workflow/PR/attachment rendering.

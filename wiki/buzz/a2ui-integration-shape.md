@@ -49,6 +49,8 @@ Here's the deploy checklist.
 
 # PR 1: desktop renderer
 
+> **Superseded (2026-11-16).** `block/buzz` `desktop/` is now deprecated (`AGENTS.md:135` @ 75d78ea). New desktop work goes to block/buzz-app, which has a plugin API. See [buzz-app-plugin-shape.md](buzz-app-plugin-shape.md). The wire format, PR 2 (mobile) and the agent side below still apply.
+
 Desktop is legacy (`AGENTS.md:622`), but it has the e2e harness and the precedent code.
 
 New files, so the file-size gate stays clean. `markdown.tsx` is at 1861/1200 lines and may not grow (see [standards](contribution-standards.md)).

@@ -16,6 +16,7 @@ sources:
 
 ## buzz
 
+- [Buzz 1.0 plugin shape](./buzz-app-plugin-shape.md): (2026-11-16) desktop work moved to block/buzz-app, which has a real plugin API; A2UI ships as a no-core-diff plugin. Supersedes the desktop half below.
 - [Recommended A2UI integration shape](./a2ui-integration-shape.md): fenced ```a2ui blocks in agent-signed kind:9 messages and canvases; actions return as p-tagged thread replies. Includes the exact PR file lists for desktop and mobile.
 - [Extension points](./extension-points.md): Buzz has no plugin system; this page ranks the seams. The config-nudge sentinel is the precedent, preview-features.json is the gate, and canvas is a markdown seam.
 - [Message model and rich content](./message-model-and-rich-content.md): the kind registry, the end-to-end trace of the diff kind 40008, and how canvas, workflows, PRs and attachments render.

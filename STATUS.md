@@ -9,11 +9,21 @@
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
 | 5. t3code integration (built first, per factory.md fold-in §6) | ✅ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); 2b CUJ green at 1100/412 (`docs/evidence/t3code-slice2b-cuj.md`); ✅ closed by Argon close review (`docs/reviews/argon-phase5-close.md`, 0 Critical/Major); carry-over minors P5.1–P5.3 landed (fork `eeb2c3ec`), P5.4 deferred to Phase 6 | same bar |
-| 5b. Buzz integration (research → recipe → `a2ui` branch) | ⏳ | same bar |
+| 5b. Buzz integration (research → recipe → `a2ui` branch) | ▶️ research refreshed for buzz-app plugin API (`wiki/buzz/buzz-app-plugin-shape.md`); recipe next | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-16: Phase 5b research refresh.
+  - Upstream `block/buzz@75d78ea` deprecated `desktop/`. All new desktop work now goes to `block/buzz-app` (Buzz 1.0), which has a real plugin API.
+  - New wiki page `wiki/buzz/buzz-app-plugin-shape.md` (buzz-app @ ff8415d):
+    - `registerCodeBlock` (mermaid/charts precedent, host fallback) vs `registerMessage` (sees the author, so it enforces the agent-signer trust rule by construction). Recommends `registerMessage`.
+    - `addInstructions` (4096 B cap) for Express rules; `addTool` for `send_a2ui`; ship default-off.
+    - buzz-app has no direct zod; its only zod is 3.25.76 (transitive), so the web_core zod-4 blocker should not apply. Unverified until installed.
+  - Old desktop PR 1 marked superseded. Mobile PR 2 is unchanged (`a2ui_core` now 0.7.0).
+  - No a2ui macro commits since 11-10 (a2ui @ 3ed96018).
+  - `zeroasterisk/buzz-app` fork does not exist.
+  - Next: `recipes/buzz.md`, buzz-app plugin slice 1, then mobile.
 - 2026-11-15 (3): P5.1–P5.3 landed on `zeroasterisk/t3code@a2ui` `eeb2c3ec`.
   - P5.1: `MessagesTimeline` mounts a lazy `A2uiThreadSync`, which syncs the thread's closed blocks in a layout effect. The panel now finds its surface even when no timeline row is mounted. `A2uiBlock` no longer syncs during render, `queueMicrotask` is gone, and a standalone block builds its own store once. `a2uiBlocks` moved out of the row context.
   - P5.2: the stub hides "Show" while the open panel's active tab is that surface.
