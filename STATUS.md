@@ -9,11 +9,24 @@
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
 | 5. t3code integration (built first, per factory.md fold-in §6) | ✅ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); 2b CUJ green at 1100/412 (`docs/evidence/t3code-slice2b-cuj.md`); ✅ closed by Argon close review (`docs/reviews/argon-phase5-close.md`, 0 Critical/Major); carry-over minors P5.1–P5.3 landed (fork `eeb2c3ec`), P5.4 deferred to Phase 6 | same bar |
-| 5b. Buzz integration (research → recipe → `a2ui` branch) | ▶️ research refreshed for buzz-app plugin API (`wiki/buzz/buzz-app-plugin-shape.md`); recipe next | same bar |
+| 5b. Buzz integration (research → recipe → `a2ui` branch) | ▶️ research refreshed (`wiki/buzz/buzz-app-plugin-shape.md`); recipe `recipes/buzz.md` written + prompt budget measured; next: fork `zeroasterisk/buzz-app`, slice 1 deps/zod check | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-16 (2): Wrote `recipes/buzz.md` (buzz-app `3fca452`, the plugin seams are unchanged since `ff8415d`).
+  - One bundled plugin, `src/bundled/a2ui/`. Chat rendering uses `registerMessage`, gated on the agent predicate from `MessageRow.tsx:399-402` (agentEnvelope / known agent / `isAgent`), so trust holds by construction.
+  - Actions go back via `session.messages.reply(channelId, root, text, [author])`, the same call `github/ResolvePull.tsx:130` makes.
+  - The wire is the `<a2ui>` sentinel, not a fence. That keeps one wire across hosts and matches upstream `EXPRESS_RULES`, and it supersedes the old fence proposal in the wiki.
+  - Tests: the message-gallery `a2ui` group plus a Playwright spec modelled on `charts.spec.mjs`.
+  - First-match risk checked: the only other `registerMessage` matchers are `diff` and `huddle`.
+  - Measured with the new `spikes/zod4-rn/prompt-budget.mjs` (@a2ui/agent 0.1.0) against the 4096 B `addInstructions` cap:
+    - `EXPRESS_RULES` alone is 3936 B and fits.
+    - Full `generate()` is 21875 B, 5.3× over.
+    - Base rules plus the 9 chat-component headers come to 4629 B, still over.
+  - Decision: `addInstructions` carries only a ≤1 KB pointer, and the full prompt is served on demand by an `a2ui_rules` tool.
+  - `@a2ui/agent` is still 0.1.0 (npm); a2ui `main` has no new macro commits.
+  - Next: fork `block/buzz-app` → `zeroasterisk/buzz-app@a2ui`, then install the deps and verify zod dedupe + the conformance demos (recipe risk 1) before any UI.
 - 2026-11-16: Phase 5b research refresh.
   - Upstream `block/buzz@75d78ea` deprecated `desktop/`. All new desktop work now goes to `block/buzz-app` (Buzz 1.0), which has a real plugin API.
   - New wiki page `wiki/buzz/buzz-app-plugin-shape.md` (buzz-app @ ff8415d):
