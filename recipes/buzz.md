@@ -47,7 +47,7 @@ Human-authored `<a2ui>` text stays plain text. `registerCodeBlock` is not used, 
 
 Deps (exact): `@a2ui/agent@0.1.0`, `@a2ui/web_core@0.15.0`, `@a2ui/react@0.15.0`. buzz-app has no direct zod. At `f307d59` it carries zod 3.25.76 (tauri-mcp-server) and 4.6.5 (`@modelcontextprotocol/server`). **Verified** on fork `87cb992` (base `f307d59`):
 - `pnpm why zod`: `web_core` and `agent` resolve zod 3.25.76.
-- `@a2ui/react` resolves the host's zod 4.6.5 (its zod is a peer dep, and `@modelcontextprotocol/server` brings 4). It has 0 runtime zod imports, so this is types-only and harmless. `pnpm peers check` flags the mismatch (and markdown-it wanting web_core ^0.14). That's noise, not a blocker.
+- `@a2ui/react` resolves the host's zod 4.6.5 (its zod is a peer dep, and `@modelcontextprotocol/server` brings 4). It has 0 runtime zod imports, so this is types-only, but **not harmless**: the catalog fails typecheck (TS2344, `ReactCatalogComponent` vs `ComponentApi`). Fixed in `3d28942` with a `pnpm-workspace.yaml` override `"@a2ui/react>zod": 3.25.76`. The host's closed dependency policy (`scripts/design-system/check-icons.mjs`) also needs `@a2ui/*` classified as non-icon, or `design:check` fails. `pnpm peers check` flags the mismatch (and markdown-it wanting web_core ^0.14). That's noise, not a blocker.
 - Conformance harness run in-tree with buzz-app's own resolution matches the zod-3 baseline exactly: compile 115/121, MessageProcessor 0 errors over 64 cases, `parseResponse` 68/72. NEEDS_ALAN #2 does not block Buzz.
 
 ## Prompt budget (measured, `spikes/zod4-rn/prompt-budget.mjs`)
