@@ -9,11 +9,18 @@
 | 3. Local mock: Paseo daemon + web UI with ≥2 harnesses; e2e harness | ✅ (mock provider via Paseo's own Playwright harness; 2nd real harness deferred, needs creds; Argon review folded) | screenshot of an agent session in local Paseo: `docs/evidence/` |
 | 4. Paseo integration (plugin on `a2ui` branch): chat renderer + canvas panel + agent tool + demos + core tests + e2e | ⏳ | e2e green, CUJ GIF, diff small |
 | 5. t3code integration (built first, per factory.md fold-in §6) | ✅ slice 1 closed; slice-2 plan done + Argon-reviewed (`docs/plans/t3code-slice2.md`); D landed (fork `ae876f91`); 2a.1–2a.5 thread store landed (fork `7273322d`); 2a CUJ green at 1100/412 (fork `037aceb5`); 2a Argon-reviewed + folded (fork `496f6f3a`); 2b.1 "Open in panel" landed (fork `8b9d0c01`); 2b.1 Argon seam review folded (plan items 9–13); seam A+B + panel edit/action test landed (fork `8dba076b`); 2b CUJ green at 1100/412 (`docs/evidence/t3code-slice2b-cuj.md`); ✅ closed by Argon close review (`docs/reviews/argon-phase5-close.md`, 0 Critical/Major); carry-over minors P5.1–P5.3 landed (fork `eeb2c3ec`), P5.4 deferred to Phase 6 | same bar |
-| 5b. Buzz integration (research → recipe → `a2ui` branch) | ▶️ research refreshed (`wiki/buzz/buzz-app-plugin-shape.md`); recipe `recipes/buzz.md` written + prompt budget measured; fork `zeroasterisk/buzz-app@a2ui` deps landed (`87cb992`), zod/conformance verified (risk 1 closed); task 3 `a2uiMessage.ts` + tests landed (`6492b72`); next: task 5 `a2uiThread.ts` port | same bar |
+| 5b. Buzz integration (research → recipe → `a2ui` branch) | ▶️ research refreshed (`wiki/buzz/buzz-app-plugin-shape.md`); recipe `recipes/buzz.md` written + prompt budget measured; fork `zeroasterisk/buzz-app@a2ui` deps landed (`87cb992`), zod/conformance verified (risk 1 closed); task 3 `a2uiMessage.ts` + tests landed (`6492b72`); task 5 `a2uiThread.ts` + tests landed (`6399171`); next: task 6 `catalog.tsx` | same bar |
 | 5c. CopilotKit alignment (partner): v1.0 + Express in `@copilotkit/a2ui-renderer`, shared conformance demos | ⏳ | agreed plan with CopilotKit |
 | 6. Factory retro: conformance fixtures + recipe template generalised | ⏳ | |
 
 ## Log
+- 2026-11-17: Buzz slice 1 task 5 landed on `zeroasterisk/buzz-app@a2ui` `6399171`. `src/bundled/a2ui/a2uiThread.ts` + `.test.ts` were ported from t3code (copied, not imported).
+  - One change from t3code: the catalog is a constructor arg (`new A2uiThreadStore(catalog)`, `a2uiThreadStore(key, catalog)`), so the store doesn't import the not-yet-written `catalog.tsx`, and tests run on the schema-only basic catalog (`BASIC_COMPONENTS`, no renderer, no lit).
+  - Also: biome fixes (no `!`, `?.` index), and `panelView` dropped (Buzz has no panel in slice 1). Logic is unchanged.
+  - Tests 10/10. Same 6 as t3code, plus 4 new: send failure → `failed`, rebuild on delete, unsubscribe, LRU-8 eviction. Mutant check: removing the `fresh` guard fails the lock test.
+  - Measured: a2ui dir vitest 30/30, `biome check --error-on-warnings src/bundled/a2ui` clean, `pnpm typecheck` exit 0.
+  - `@a2ui/agent` is still 0.1.0, and a2ui `main` (`1cbef31b`) has no macro commits.
+  - Next: task 6, `catalog.tsx` (basic catalog APIs onto `src/shared/design-system/ui`, `pnpm design:check`).
 - 2026-11-16 (4): Buzz slice 1 task 3 landed on `zeroasterisk/buzz-app@a2ui` `6492b72`. `src/bundled/a2ui/a2uiMessage.ts` + `.test.ts` were copied in from t3code (principle 1, never imported).
   - Host-convention edits only: the test runner is `vitest`, there is no `.ts` import suffix, and the code is biome-formatted. `noNonNullAssertion` is satisfied by destructuring the fence match with defaults and using `charAt(0)`, and `useTemplate` is fixed too. Logic is unchanged.
   - Measured: vitest 20/20, `biome check --error-on-warnings src/bundled/a2ui` clean, `pnpm typecheck` exit 0. Full `pnpm check` (design checks) waits until UI files exist. `@a2ui/agent` is still 0.1.0.
