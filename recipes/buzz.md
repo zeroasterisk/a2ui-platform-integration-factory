@@ -76,6 +76,6 @@ Consequence: the full Express prompt **cannot** go through `addInstructions`. Sp
 
 ## Risks to measure first
 1. zod dedupe and the conformance demos inside the buzz-app build (above).
-2. Lazy chunk weight: t3code measured 212 KB gzip, dominated by antlr4ng + `@a2ui/agent`. Check that buzz-app's Vite config splits it.
+2. Lazy chunk weight: t3code measured 212 KB gzip, dominated by antlr4ng + `@a2ui/agent`. Check that buzz-app's Vite config splits it. **Closed 2026-11-19** (`spikes/buzz/{chunk-weight,compare-builds}.mjs`, fork `42d8a0d` vs base `f307d59`): the default Vite config splits it with no change. `main` grows +2.0 KB gzip (sentinel parser + registration only); `A2uiBlock` lazy chunk is 207.6 KB gzip and holds all of antlr4ng, ExpressFormat, catalog, zod and ~lit (the basic-catalog barrel, NEEDS_ALAN #2). Vite warns that `@a2ui/agent` `skill.js`/`catalog-providers.js` import `fs`/`path` (externalized; unused on the render path).
 3. `registerMessage` is first-match-wins. Checked at `3fca452`: the only bundled matchers are `diffs` (`!!message.diff`) and `huddles` (`!!message.huddle`), so neither collides. Re-check on rebase.
 4. The plugin API sits under "Likely to break: conversation contributions" (`docs/plugin-architecture.md:20`). Pin the fork base and re-check seams each run.
