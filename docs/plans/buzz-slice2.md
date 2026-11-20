@@ -22,7 +22,7 @@ Seam: `ctx.agents.addTool(AddedTool)` (`src/buzz-mcp/session-tools.ts:46`); plug
 - Tests (Vitest, fake client + relay like `pull-state-tool.ts` tests): valid triage form → one `reply` call with the exact text; `Iframe` → throws, 0 posts; `update=true` on an unknown surface → throws. Mutant: skip validation → the Iframe case posts and fails.
 - Open (record, don't guess): whether `send_a2ui` should honour `audience` / `request` like the host `send`. Default: omit; the agent can still use host `send` for plain text.
 
-## 2.3 Links + strict matcher (two Argon minors)
+## 2.3 Links + strict matcher (two Argon minors) — ✅ `b9d521f` (also passes `canOpenLink={canOpen}`)
 - `A2uiMessage`: take `{message, canOpen, open}` from `TargetOpener`; pass `onOpenLink={(url) => open(url)}` to `MessageMarkdown` (replaces `() => false`).
 - `trust.ts`: `isA2uiMessage` requires `splitA2uiSegments(content).some((s) => s.kind === "a2ui")` instead of `includes("<a2ui>")`, so an inline mention or a fenced example stays a normal message. Cheap pre-check `includes("<a2ui")` kept first.
 - Tests: `A2uiMessage.test.tsx` link click calls `open` with the URL; `trust` table: inline `<a2ui>` in prose and inside a ```` ``` ```` fence → false. Mutant: revert to `includes` → fence case fails.
