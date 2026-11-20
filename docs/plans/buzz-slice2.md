@@ -5,7 +5,7 @@ Fork `zeroasterisk/buzz-app@a2ui` at `6c01c80` (slice 1 closed 2026-11-19 by `do
 ## Order and gates
 2.1 → 2.2 → 2.3 → 2.4 (one commit each, each with its own mutant check) → 2.5 live-relay CUJ → one Argon review at the slice-2 boundary. Canvas (recipe §Slice 2 "Canvas") is out of scope: decide after 2.5.
 
-## 2.1 Per-surface author routing (closes Argon M3)
+## 2.1 Per-surface author routing (closes Argon M3) — ✅ `6750a09`
 Problem (verified): `A2uiBlock.tsx` calls `store.setSendMessage(onSendMessage)` in an effect, and `onSendMessage` closes over the block's `message.authorId`. The store has one sender, so the last-mounted block in a thread wins. In a thread with two agents, an action on agent A's surface can mention agent B.
 
 Change:
