@@ -27,7 +27,7 @@ Seam: `ctx.agents.addTool(AddedTool)` (`src/buzz-mcp/session-tools.ts:46`); plug
 - `trust.ts`: `isA2uiMessage` requires `splitA2uiSegments(content).some((s) => s.kind === "a2ui")` instead of `includes("<a2ui>")`, so an inline mention or a fenced example stays a normal message. Cheap pre-check `includes("<a2ui")` kept first.
 - Tests: `A2uiMessage.test.tsx` link click calls `open` with the URL; `trust` table: inline `<a2ui>` in prose and inside a ```` ``` ```` fence → false. Mutant: revert to `includes` → fence case fails.
 
-## 2.4 Thread-view hydration (Argon §4.4)
+## 2.4 Thread-view hydration (Argon §4.4) — ✅ `6035547` (0 host lines)
 Problem: `useThreadBlocks` reads only `session.channels.window(channelId).rows`. In `ThreadPanel` (`features/messages/ThreadPanel.tsx`) replies come from a `ThreadView` (`relay/threads.ts:90`, `snapshot().replies`), which the channel window may not hold, and an old root scrolls out of the window. Then an `update=true` reply fails with "Surface not found".
 Change:
 - `useThreadBlocks` merges two sources, deduped by id: the channel window rows and, when `message.threadRootId` is set, an owned `session.thread(channelId, rootId)` reader (`relay/session.ts:2831`; capacity 64, dispose on unmount). Only opened when the window lacks the root.
