@@ -35,7 +35,7 @@ Change:
 - Tests: a thread whose root is outside the window → the reply's `update=true` renders after the reader resolves; reader disposed on unmount. Mutant: no reader → blocked note shown.
 - Budget check: if this needs a host-file change (e.g. ThreadPanel passing its view), stop and ask Argon for the seam; target 0 host lines.
 
-## 2.5 Live-relay CUJ
+## 2.5 Live-relay CUJ — ✅ `68be1ee` (production broker + modeled relay; docker blocked in sandbox; found + fixed root-not-superseded bug; `docs/evidence/buzz-slice2-live-cuj.md`)
 Goal: prove the full round trip that slice 1 covered only in Vitest (gallery relay `reply` is a no-op).
 - Relay: `block/buzz` `just relay` (local `ws://localhost:3000`, `docker-compose.yml`), via the persistent docker CLI. If it can't run in this sandbox, fall back to the in-process `createRelaySession` harness used by `relay/diff-messages.test.ts` and say so in the notes.
 - Script `spikes/buzz/live-cuj.mjs`: a scripted agent identity posts via `send_a2ui` (turn 1 triage form); the person edits and applies in the app; the agent sees the `a2ui-action` reply with the edited `context` and the p-tag; agent turn 2 posts `surface("triage", update=true)`; turn 1 collapses to "Updated below" and the surface unlocks.
