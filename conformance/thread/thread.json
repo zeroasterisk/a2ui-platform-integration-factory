@@ -1,0 +1,621 @@
+{
+ "version": 1,
+ "event": "go",
+ "cases": [
+  {
+   "id": "update-supersedes-earlier",
+   "group": "supersede",
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"second\")])"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m2:0": {
+        "ok": true,
+        "surfaceIds": [
+         "triage"
+        ]
+       }
+      },
+      "live": {
+       "m1:0": [],
+       "m2:0": [
+        "triage"
+       ]
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "second"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "no-surface-gets-own-id",
+   "group": "replay",
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "root = Text(\"a\")"
+      },
+      {
+       "key": "m2:0",
+       "source": "root = Text(\"b\")"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m1:0": {
+        "ok": true,
+        "surfaceIds": [
+         "a2ui-m1:0"
+        ]
+       },
+       "m2:0": {
+        "ok": true,
+        "surfaceIds": [
+         "a2ui-m2:0"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "off-catalog-update-keeps-earlier",
+   "group": "trust.off-catalog",
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\", update=true)\nroot = Iframe(url=\"https://x\")"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m2:0": {
+        "ok": false
+       }
+      },
+      "live": {
+       "m1:0": [
+        "triage"
+       ]
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "first"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "update-unknown-surface-rejected",
+   "group": "replay",
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"ghost\")])"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m1:0": {
+        "ok": false
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "sync-idempotent-then-rebuild-on-edit",
+   "group": "replay",
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "mark": true
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "sameSurfaceAsMark": {
+       "triage": true
+      },
+      "versionSinceMark": 0
+     }
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"edited\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "sameSurfaceAsMark": {
+       "triage": false
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "edited"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "rebuild-on-delete",
+   "group": "replay",
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"second\")])"
+      }
+     ]
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "live": {
+       "m1:0": [
+        "triage"
+       ]
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "first"
+        ],
+        "excludes": [
+         "second"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "lock-survives-replay-fresh-reply-unlocks",
+   "group": "action-lock",
+   "steps": [
+    {
+     "sender": "ok"
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "dispatch": "triage"
+    },
+    {
+     "expect": {
+      "sent": {
+       "triage": "sent"
+      },
+      "sends": 1,
+      "sendContains": [
+       "\"surfaceId\":\"triage\""
+      ]
+     }
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"edited\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "sent": {
+       "triage": "sent"
+      }
+     }
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"edited\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"second\")])"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "sent": {
+       "triage": null
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "one-send-per-surface-before-lock",
+   "group": "action-lock",
+   "steps": [
+    {
+     "sender": "hold"
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "dispatch": "triage"
+    },
+    {
+     "dispatch": "triage"
+    },
+    {
+     "expect": {
+      "sent": {
+       "triage": "sending"
+      }
+     }
+    },
+    {
+     "release": true
+    },
+    {
+     "dispatch": "triage"
+    },
+    {
+     "expect": {
+      "sent": {
+       "triage": "sent"
+      },
+      "sends": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "failed-send-marks-failed",
+   "group": "action-lock",
+   "steps": [
+    {
+     "sender": "fail"
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"first\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])"
+      }
+     ]
+    },
+    {
+     "dispatch": "triage"
+    },
+    {
+     "expect": {
+      "sent": {
+       "triage": "failed"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "recreate-rejected-keeps-first",
+   "group": "trust.hijack",
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"mine\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-a"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"hijack\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-b"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m2:0": {
+        "ok": false
+       }
+      },
+      "live": {
+       "m1:0": [
+        "triage"
+       ]
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "mine"
+        ],
+        "excludes": [
+         "hijack"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "reply-routes-to-surface-owner",
+   "group": "ownership",
+   "requires": [
+    "ownership"
+   ],
+   "steps": [
+    {
+     "sender": "ok"
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"a\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-a"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"other\")\nroot = Text(\"b\")",
+       "authorId": "agent-b"
+      }
+     ]
+    },
+    {
+     "dispatch": "triage"
+    },
+    {
+     "expect": {
+      "sendAuthors": [
+       "agent-a"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "cross-agent-update-blocked",
+   "group": "trust.hijack",
+   "requires": [
+    "ownership"
+   ],
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"mine\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-a"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"hijack\")])",
+       "authorId": "agent-b"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m2:0": {
+        "ok": false,
+        "error": "Surface triage belongs to another agent"
+       }
+      },
+      "live": {
+       "m1:0": [
+        "triage"
+       ]
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "mine"
+        ],
+        "excludes": [
+         "hijack"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"mine\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-a"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"hijack\")])",
+       "authorId": "agent-b"
+      },
+      {
+       "key": "m3:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"owner\")])",
+       "authorId": "agent-a"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m3:0": {
+        "ok": true
+       }
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "owner"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "ownership-survives-rebuild",
+   "group": "trust.hijack",
+   "requires": [
+    "ownership"
+   ],
+   "steps": [
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"mine\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-a"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"hijack\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-b"
+      },
+      {
+       "key": "m3:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"owner\")])",
+       "authorId": "agent-a"
+      }
+     ]
+    },
+    {
+     "sync": [
+      {
+       "key": "m1:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"mine2\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-a"
+      },
+      {
+       "key": "m2:0",
+       "source": "surface(\"triage\")\nroot = Column([Text(\"hijack\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])",
+       "authorId": "agent-b"
+      },
+      {
+       "key": "m3:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"owner\")])",
+       "authorId": "agent-a"
+      },
+      {
+       "key": "m4:0",
+       "source": "surface(\"triage\", update=true)\nroot = Column([Text(\"again\")])",
+       "authorId": "agent-b"
+      }
+     ]
+    },
+    {
+     "expect": {
+      "results": {
+       "m3:0": {
+        "ok": true
+       },
+       "m4:0": {
+        "ok": false,
+        "error": "Surface triage belongs to another agent"
+       }
+      },
+      "texts": {
+       "triage": {
+        "contains": [
+         "owner"
+        ],
+        "excludes": [
+         "again"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
