@@ -1,0 +1,173 @@
+{
+ "forbidden": [
+  "iframe",
+  "script",
+  "object",
+  "embed",
+  "frame",
+  "form[action]",
+  "a[href^='javascript' i]",
+  "img[src^='javascript' i]",
+  "[onerror]",
+  "[onclick]",
+  "[srcdoc]"
+ ],
+ "render": [
+  {
+   "id": "valid-form-draws-natively",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {}))\nroot = Card(Column([title, go]))",
+   "expect": {
+    "state": "surface",
+    "textContains": [
+     "Flaky test triage",
+     "Apply"
+    ],
+    "textExcludes": [
+     "surface(",
+     "Column("
+    ],
+    "present": [
+     "button"
+    ]
+   }
+  },
+  {
+   "id": "off-catalog-iframe-blocked-with-source",
+   "source": "surface(\"bad\")\nroot = Iframe(url=\"https://evil.example\")",
+   "expect": {
+    "state": "error",
+    "textContains": [
+     "Iframe(",
+     "https://evil.example"
+    ],
+    "absent": [
+     "iframe"
+    ]
+   }
+  },
+  {
+   "id": "off-catalog-script-blocked-with-source",
+   "source": "surface(\"bad\")\nroot = Script(src=\"https://evil.example/x.js\")",
+   "expect": {
+    "state": "error",
+    "textContains": [
+     "Script("
+    ],
+    "absent": [
+     "script"
+    ]
+   }
+  },
+  {
+   "id": "off-catalog-nested-in-valid-tree-blocks-whole-block",
+   "source": "surface(\"bad\")\nok = Text(\"fine\")\nroot = Column([ok, Html(content=\"<b>x</b>\")])",
+   "expect": {
+    "state": "error",
+    "textContains": [
+     "Html("
+    ],
+    "absent": [
+     "b"
+    ]
+   }
+  },
+  {
+   "id": "text-markup-stays-text",
+   "source": "surface(\"t\")\nroot = Text(\"<img src=x onerror=alert(1)><script>alert(2)</script>\")",
+   "expect": {
+    "state": "surface",
+    "textContains": [
+     "<img src=x onerror=alert(1)>"
+    ],
+    "absent": [
+     "img"
+    ]
+   }
+  },
+  {
+   "id": "text-markdown-link-not-a-link",
+   "source": "surface(\"t\")\nroot = Text(\"[click](javascript:alert(1))\")",
+   "expect": {
+    "state": "surface",
+    "textContains": [
+     "javascript:alert(1)"
+    ],
+    "absent": [
+     "a"
+    ]
+   }
+  },
+  {
+   "id": "image-javascript-url-dropped",
+   "source": "surface(\"i\")\nroot = Image(url=\"javascript:alert(1)\", description=\"x\")",
+   "expect": {
+    "state": "surface",
+    "attrNever": {
+     "src": "^\\s*javascript:"
+    }
+   }
+  },
+  {
+   "id": "image-protocol-relative-url-dropped",
+   "source": "surface(\"i\")\nroot = Image(url=\"//evil.example/p.png\", description=\"x\")",
+   "expect": {
+    "state": "surface",
+    "attrNever": {
+     "src": "^\\s*//"
+    }
+   }
+  },
+  {
+   "id": "image-https-url-kept",
+   "source": "surface(\"i\")\nroot = Image(url=\"https://example.com/p.png\", description=\"pic\")",
+   "expect": {
+    "state": "surface",
+    "present": [
+     "img[src='https://example.com/p.png']"
+    ]
+   }
+  }
+ ],
+ "messages": [
+  {
+   "id": "agent-block-is-interactive",
+   "author": "agent",
+   "text": "Here.\n\n<a2ui>\nsurface(\"triage\")\ntitle = Text(\"Flaky test triage\")\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {}))\nroot = Card(Column([title, go]))\n</a2ui>",
+   "expect": {
+    "interactive": true
+   }
+  },
+  {
+   "id": "person-block-stays-plain-text",
+   "requires": [
+    "authorKind"
+   ],
+   "author": "person",
+   "text": "Here.\n\n<a2ui>\nsurface(\"triage\")\ntitle = Text(\"Flaky test triage\")\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {}))\nroot = Card(Column([title, go]))\n</a2ui>",
+   "expect": {
+    "interactive": false
+   }
+  },
+  {
+   "id": "fenced-block-stays-plain-text",
+   "author": "agent",
+   "text": "Example:\n\n```\n<a2ui>\nsurface(\"triage\")\ntitle = Text(\"Flaky test triage\")\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {}))\nroot = Card(Column([title, go]))\n</a2ui>\n```",
+   "expect": {
+    "interactive": false
+   }
+  },
+  {
+   "id": "streaming-block-shows-no-dsl",
+   "author": "agent",
+   "text": "Working…\n\n<a2ui>\nsurface(\"x\")\nroot = Text(\"hi",
+   "expect": {
+    "interactive": false,
+    "pending": true,
+    "textExcludes": [
+     "surface(",
+     "root ="
+    ]
+   }
+  }
+ ]
+}
