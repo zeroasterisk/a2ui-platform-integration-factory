@@ -40,5 +40,22 @@ Gate met, with a blocking finding. Paseo (zod 4 external) **cannot** use `parseR
 3. `zod/v3` is the tactical fix. `zod` as a peer dependency (#2002) plus zod-agnostic introspection (#2753/#2160) is the durable one.
 4. Fixed in this run: the harness now runs `parseResponse` on every case (row above).
 
+## Re-run on `@a2ui/agent@0.2.1` + `@a2ui/web_core@0.16.1` (2026-11-23)
+
+Both were released 2026-11-23. Same scripts, unchanged, in a scratch install pinned to the new versions. Conformance from A2UI `main` @ `0602f1c5` (135 compile cases, up from 121).
+
+| zod resolved as | compile | MessageProcessor (68 cases) | `parseResponse` (76 non-error cases) | RN entry |
+|---|---|---|---|---|
+| zod 3.25.76 (declared) | 128/135 | 0 errors | 72/76 | ✅ 1 surface |
+| **zod 4.6.7 aliased** | 128/135 | **5 errors** (`VALIDATION_FAILED` on check cases, new) | **41/76** (was 46/72) | ❌ orphaned `root_children_0` |
+| zod 4.6.7 via `zod/v3` compat | 128/135 | 0 errors | 72/76 | ✅ 1 surface |
+
+- The zod 4 bug is still there and has widened. `reference-map.js`, `ref-fields.js` and now `generic-binder.js` read `_def.typeName`. web_core still declares `zod ^3.25.76` as a dependency, not a peer. The `zod/v3` fix still restores parity with no other change. NEEDS_ALAN #2 stands.
+- `EXPRESS_RULES` still doesn't teach `surface("<id>", update=true)`: the compiler accepts it, and the decompiler writes it, but the prompt never mentions it. Ask 3 stands.
+- `catalogs/basic/v1` still re-exports the Lit `markdown` directive. `sideEffects:false` is set. Ask 2 stands.
+- RN-shaped bundle grew: zod 3 707 KB raw / 190 KB gzip (was 636 / 172). It still has 0 `customElements` refs.
+- No TS macros in `@a2ui/agent` 0.2.1. The CHANGELOG has no macro entry, and `compiler.js` doesn't contain the word.
+- Upgrade risk for the forks (all pinned 0.1.0 / 0.15.0): 0.2.0 is breaking for v1.0. It emits `@catalogId`/`@metadata` envelope keys, checks `callRendererFunction` against catalogs, and changes the prompt layout. web_core 0.16.0 makes `TextField.value` required. The fork conformance replays must be re-run on the new versions before any bump.
+
 ## Files
 `harness.mjs` (conformance runner), `rn-entry.mjs` (RN-shaped entry), `run.sh` (zod3/zod4 runs + bundles), `variants.sh` (`zod/v3` compat + `/processing` subpath), `litcheck.mjs` (lit bytes in the output, from the esbuild metafile). `out/` and `shims/` are generated.

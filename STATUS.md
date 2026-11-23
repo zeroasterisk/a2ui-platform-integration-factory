@@ -14,6 +14,14 @@
 | 6. Factory retro: conformance fixtures + recipe template generalised | ▶️ `conformance/wire/` (23) + `thread/` (13) + `trust/` (13) green on t3code + Buzz; `prompt/` (26) green on Buzz, t3code has no agent side; visual group + recipe template next | every group replayed green on t3code + Buzz; recipe template |
 
 ## Log
+- 2026-11-23 (3): Upstream released `@a2ui/agent` 0.2.0/0.2.1 and `@a2ui/web_core` 0.16.0/0.16.1 today, the first bump since 0.1.0/0.15.0. Re-ran spike 2b on them (A2UI `main` @ `0602f1c5`, 135 compile cases); results are in `spikes/zod4-rn/README.md`.
+  - zod 3: compile 128/135, processor 0 errors, `parseResponse` 72/76.
+  - zod 4 aliased is worse than before: `parseResponse` 41/76 (was 46/72), 5 new processor `VALIDATION_FAILED` errors, RN entry orphaned. `generic-binder.js` now reads `_def.typeName` too.
+  - The `zod/v3` compat restores 72/76 with 0 errors, so the proposed upstream fix still holds.
+  - All 3 upstream asks are still open: zod/v3, lit-free `catalogs/basic/v1` (still re-exports `markdown`), and `update=true` missing from the prompt. No TS macros in 0.2.1.
+  - The RN bundle grew to 190 KB gzip (was 172).
+  - The forks are pinned to 0.1.0/0.15.0. 0.2.0 is breaking for v1.0 (`@`-prefixed envelope keys, prompt layout, `callRendererFunction` checks; web_core makes `TextField.value` required).
+  - Next: a throwaway bump trial on Buzz to 0.2.1/0.16.1, replaying the 4 conformance groups plus the a2ui vitest suite, to measure the break before `conformance/visual/`.
 - 2026-11-23 (2): Phase 6 task 4: shared trust conformance in `conformance/trust/` (`trust.json` from `gen.py`, 9 render + 4 message cases plus a forbidden-element list; dependency-free `check.mjs` run in the host's test runner against its real block component and message dispatch).
   - Measured: Buzz `bf2c07a` 13/13 (jsdom). t3code `7281ea65` 12/12 + 1 skip (browser project; the person-authored case skips since only assistant rows render blocks).
   - Mutants: source disclosure removed → 3 fail (both hosts); `sanitizeMediaUrl` bypassed → 2 fail (both); Buzz matcher accepting any author → 1 fail. No real gap found: both hosts already block off-catalog with source, keep `Text` markup inert and sanitize `Image` URLs.
