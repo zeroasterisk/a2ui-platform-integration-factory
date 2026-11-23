@@ -1,0 +1,179 @@
+{
+ "agentId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "pointer": {
+  "maxBytes": 1024,
+  "mustMention": [
+   [
+    "<a2ui>"
+   ],
+   [
+    "</a2ui>",
+    "…</a2ui>"
+   ],
+   [
+    "update=true"
+   ],
+   [
+    "code fence",
+    "fence"
+   ],
+   [
+    "basic catalog"
+   ],
+   [
+    "a2ui-action"
+   ]
+  ],
+  "mustNotContain": [
+   "```"
+  ],
+  "mustNameTools": [
+   "rules",
+   "send"
+  ]
+ },
+ "rules": {
+  "minBytes": 4097,
+  "mustContain": [
+   "surface(",
+   "ChoicePicker",
+   "Button",
+   "Event("
+  ]
+ },
+ "send": [
+  {
+   "id": "valid-form-posts-exact-text",
+   "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>",
+   "earlier": [],
+   "expect": {
+    "posted": true
+   }
+  },
+  {
+   "id": "no-block-refused",
+   "text": "Just prose.",
+   "earlier": [],
+   "expect": {
+    "posted": false
+   }
+  },
+  {
+   "id": "fenced-block-is-not-a-block",
+   "text": "```\n<a2ui>\nroot = Text(\"x\")\n</a2ui>\n```",
+   "earlier": [],
+   "expect": {
+    "posted": false
+   }
+  },
+  {
+   "id": "unclosed-block-refused",
+   "text": "<a2ui>\nroot = Text(\"x\")",
+   "earlier": [],
+   "expect": {
+    "posted": false
+   }
+  },
+  {
+   "id": "off-catalog-refused",
+   "text": "<a2ui>\nsurface(\"x\")\nroot = Iframe(url=\"https://example.com\")\n</a2ui>",
+   "earlier": [],
+   "expect": {
+    "posted": false
+   }
+  },
+  {
+   "id": "update-unknown-surface-refused",
+   "text": "<a2ui>\nsurface(\"nope\", update=true)\nroot = Column([Text(\"Done\")])\n</a2ui>",
+   "earlier": [],
+   "expect": {
+    "posted": false
+   }
+  },
+  {
+   "id": "recreate-existing-surface-refused",
+   "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>",
+   "earlier": [
+    {
+     "id": "m1",
+     "authorId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "authorKind": "agent",
+     "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>"
+    }
+   ],
+   "expect": {
+    "posted": false
+   }
+  },
+  {
+   "id": "update-own-surface-posts",
+   "text": "<a2ui>\nsurface(\"triage\", update=true)\nroot = Column([Text(\"Done\")])\n</a2ui>",
+   "earlier": [
+    {
+     "id": "m1",
+     "authorId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "authorKind": "agent",
+     "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>"
+    }
+   ],
+   "expect": {
+    "posted": true
+   }
+  },
+  {
+   "id": "update-other-agents-surface-refused",
+   "requires": [
+    "ownership"
+   ],
+   "text": "<a2ui>\nsurface(\"triage\", update=true)\nroot = Column([Text(\"Done\")])\n</a2ui>",
+   "earlier": [
+    {
+     "id": "m1",
+     "authorId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+     "authorKind": "agent",
+     "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>"
+    }
+   ],
+   "expect": {
+    "posted": false,
+    "errorMatches": "another agent"
+   }
+  },
+  {
+   "id": "person-block-claims-no-surface",
+   "requires": [
+    "authorKind"
+   ],
+   "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>",
+   "earlier": [
+    {
+     "id": "m1",
+     "authorId": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+     "authorKind": "person",
+     "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>"
+    }
+   ],
+   "expect": {
+    "posted": true
+   }
+  },
+  {
+   "id": "person-block-not-updatable",
+   "requires": [
+    "authorKind"
+   ],
+   "text": "<a2ui>\nsurface(\"triage\", update=true)\nroot = Column([Text(\"Done\")])\n</a2ui>",
+   "earlier": [
+    {
+     "id": "m1",
+     "authorId": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+     "authorKind": "person",
+     "text": "Pick one.\n<a2ui>\nsurface(\"triage\")\nroot = Column([Text(\"Which?\"), Button(Text(\"Go\"), action=Event(\"go\", {}))])\n</a2ui>"
+    }
+   ],
+   "expect": {
+    "posted": false
+   }
+  }
+ ]
+}
