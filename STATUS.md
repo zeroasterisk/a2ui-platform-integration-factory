@@ -14,6 +14,11 @@
 | 6. Factory retro: conformance fixtures + recipe template generalised | ▶️ `conformance/wire/` (23) + `thread/` (13) + `trust/` (13) green on t3code + Buzz; `prompt/` (26) green on Buzz, t3code has no agent side; visual group + recipe template next | every group replayed green on t3code + Buzz; recipe template |
 
 ## Log
+- 2026-11-24: Throwaway bump trial of Buzz `bf2c07a` to `@a2ui/agent` 0.2.1 + `react`/`web_core` 0.16.1 (detached worktree, nothing pushed). Notes: `spikes/buzz/bump-0.2.1.md`.
+  - Every gate matches the baseline: a2ui vitest 57/57, tsc 0, and conformance wire 23/23, thread 13/13, prompt 26/26, trust 13/13. A source-removed mutant still fails trust 3.
+  - Bundle: main unchanged. The A2UI lazy chunks are +3.1 KB gz (214.6 → 217.7; `A2uiBlock` 18.6 → 22.7).
+  - The spike-2b breaking changes don't reach Buzz's path. The zod-3 override still masks the zod 4 break. `update=true` is still taught only by Buzz's own pointer.
+  - Verdict: deps-only bump is safe. Next: land it on `buzz-app@a2ui` with the browser spec, the same trial on t3code, then `conformance/visual/`.
 - 2026-11-23 (3): Upstream released `@a2ui/agent` 0.2.0/0.2.1 and `@a2ui/web_core` 0.16.0/0.16.1 today, the first bump since 0.1.0/0.15.0. Re-ran spike 2b on them (A2UI `main` @ `0602f1c5`, 135 compile cases); results are in `spikes/zod4-rn/README.md`.
   - zod 3: compile 128/135, processor 0 errors, `parseResponse` 72/76.
   - zod 4 aliased is worse than before: `parseResponse` 41/76 (was 46/72), 5 new processor `VALIDATION_FAILED` errors, RN entry orphaned. `generic-binder.js` now reads `_def.typeName` too.
