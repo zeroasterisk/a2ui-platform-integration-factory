@@ -14,6 +14,10 @@
 | 6. Factory retro: conformance fixtures + recipe template generalised | ▶️ `conformance/wire/` (23) + `thread/` (13) + `trust/` (13) green on t3code + Buzz; `prompt/` (26) green on Buzz, t3code has no agent side; visual group + recipe template next | every group replayed green on t3code + Buzz; recipe template |
 
 ## Log
+- 2026-11-24 (2): Landed the deps-only bump on `zeroasterisk/buzz-app@a2ui` `cccd2c5` (verified via gh api): `@a2ui/agent` 0.2.1, `@a2ui/react` + `web_core` 0.16.1. pnpm added `minimumReleaseAgeExclude` for 4 `@a2ui/*` packages, and the zod-3 override is kept.
+  - Measured on the real tree: a2ui vitest 57/57, `tsc` 0, biome clean. Browser `a2ui.spec` + `a2ui-live.spec` 6/6 (chromium, `--no-deps --workers 1`; without `--no-deps` the measurements project runs first and fails 3 unrelated host perf specs).
+  - The conformance groups were not re-run, because the tree matches the trial (`spikes/buzz/bump-0.2.1.md`: 23/13/26/13).
+  - Next: the same bump trial on t3code `7281ea65`, then `conformance/visual/`.
 - 2026-11-24: Throwaway bump trial of Buzz `bf2c07a` to `@a2ui/agent` 0.2.1 + `react`/`web_core` 0.16.1 (detached worktree, nothing pushed). Notes: `spikes/buzz/bump-0.2.1.md`.
   - Every gate matches the baseline: a2ui vitest 57/57, tsc 0, and conformance wire 23/23, thread 13/13, prompt 26/26, trust 13/13. A source-removed mutant still fails trust 3.
   - Bundle: main unchanged. The A2UI lazy chunks are +3.1 KB gz (214.6 → 217.7; `A2uiBlock` 18.6 → 22.7).
