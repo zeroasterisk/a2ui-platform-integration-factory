@@ -41,8 +41,8 @@ High-confidence fits, to be reviewed before promotion:
 - `docs/intent.md`: goal, questions, initial answers, open decisions
 - `docs/design/`: principles, factory method, per-host designs
 - `docs/plans/`: phased plans
-- `recipes/<host>.md`: per-host adapter spec (extension points, component map, action round-trip, e2e). TBD
-- `conformance/`: shared fixtures + replay scripts every integration must pass (see `conformance/README.md`; `wire/` done).
+- `recipes/<host>.md`: per-host adapter spec (extension points, component map, action round-trip, e2e); new hosts start from `recipes/TEMPLATE.md`
+- `conformance/`: shared fixtures + replay scripts every integration must pass (see `conformance/README.md`; all 5 groups done).
 - `wiki/`: OKF v0.2 knowledge bundle
 - `STATUS.md` / `NEEDS_ALAN.md` / `CRON.md`: background driver state
 

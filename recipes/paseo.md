@@ -13,7 +13,7 @@ Applied triage.
 
 ## Files (slice 1: chat-inline, client only)
 1. `paseo-plugin.json`: `{"id":"a2ui","requirements":{"paseo":">=0.15.0"}}`. The e2e `copyPluginExample` rewrites requirements to the checkout version.
-2. `package.json`: private, `dependencies` exact `@a2ui/agent@0.1.0`, `@a2ui/web_core@0.15.0` (bundled by the plugin compiler, like `markdown-panel`'s `@codemirror/*`).
+2. `package.json`: private, `dependencies` exact `@a2ui/agent@0.2.1`, `@a2ui/web_core@0.16.1` (planned at 0.1.0/0.15.0; 0.2.x is breaking for v1.0, see `spikes/zod4-rn/README.md`) (bundled by the plugin compiler, like `markdown-panel`'s `@codemirror/*`).
 3. `shared/a2ui.ts`: the Zod schema for the plugin item `{kind:"a2ui", version:1, data:{source, closed, phase}}`, plus `splitA2uiSegments(text)` (same contract as t3code's, factory.md fold-in §3: tags inside code fences ignored, unclosed tag → `closed:false` → host `Loading`) and `a2uiActionMessage(action)`. Pure, no deps.
 4. `index.client.tsx`: `addTimelineTransformer({id:"a2ui", query:{itemType:"assistant_message"}, transform})`. It returns `undefined` when the text has no `<a2ui`, so the host keeps its own row. Otherwise it returns one item per segment: `kind:"a2ui-markdown"` (rendered with host `Markdown` from `@getpaseo/plugin/client/ui`) or `kind:"a2ui"`, with stable `id`s (`<segment index>`). `addTimelineRenderer` for both kinds.
 5. `client/surface.tsx` (one `MessageProcessor` per agent thread, keyed by agentId; guards from factory.md fold-in §4; the generated skill text gets the `a2ui-action` schema appended, per fold-in §5): compiles with `ExpressFormat([catalog]).createParser().parseResponse(source)` → `MessageProcessor` (web_core root/state/processing subpaths) → RN component map over `react-native` `View`/`Text`/`Pressable` + host `TextInput`, `Icon`, `Markdown`, styled only with `theme.colors.*` from `PluginHostProps` (like `pi-tasks.tsx`). While `phase === "streaming"` and the tag is unclosed, show host `Loading`. On a parse or validation error, render the raw source in a code block.
@@ -21,16 +21,16 @@ Applied triage.
 7. `a2ui.test.ts`: vitest, colocated like `pi-tasks.test.ts`. A transformer table covering none / complete / unclosed-streaming / two surfaces / adversarial; a compile smoke test for each conformance demo.
 8. `README.md`: in the voice of the other examples (what it recognises, what it renders, no server entry).
 
-## Slice 2 (agent tool + canvas)
-- `index.server.ts`: `defineAgentTool` `a2ui_render` attached through `agent.open.before`, gated by label `a2ui/enabled` (template: `agent-tools`). It validates Express, then `timeline.append({type:"plugin", id:surfaceId, kind:"a2ui", …})`. The same id replaces the surface in place. Known limits: 64 KiB `data` cap, rows lost on daemon restart.
+## Slice 2 (agent tools + canvas)
+- Agent side follows the two-tier contract (`recipes/TEMPLATE.md` §5, gated by `conformance/prompt/`): a ≤1 KB pointer appended by the `agent.open.before` server hook for agents labelled `a2ui/enabled` (template: `agent-tools`), plus `defineAgentTool` `a2ui_rules` (returns `ExpressPromptGenerator.generate()`) and `send_a2ui` (replays the agent's earlier blocks into a scratch thread store, validates, then posts the block as the agent's message text, so the same transformer path renders it). This replaces the earlier `a2ui_render` + full-skill-install plan.
+- Optional later: a `timeline.append({type:"plugin", id:surfaceId, kind:"a2ui", …})` fast path. It must still pass `prompt/` (map `posted` to a real append) and keeps the known limits (64 KiB `data` cap, rows lost on daemon restart).
 - `addAgentPanel({id:"a2ui-canvas"})` plus an "Open in panel" button on the surface (`openPanel`). The panel reads the latest `a2ui` rows through `usePaseo().agents.ref(id).timeline`. `tab.setState` stores the last surfaceId.
-- Skill install: the plugin ships the generated skill text, and the server hook appends it for labelled agents.
 
 ## e2e (Playwright, existing harness)
 `packages/app/e2e/browser/plugin-a2ui-example.spec.ts`, modelled on `viewInlineThinkingExample`:
 `copyPluginExample("a2ui")` → `patchDaemonConfig({pluginsEnabled:true})` → `installDirectoryPlugin` → `seedMockAgentWorkspace({model:"ten-second-stream", featureValues:{mockStreamingAssistantResponse: <demo text>, mockStreamingAssistantIntervalMs: 300}})` → send a prompt → assert the card heading/button render natively (`getByRole`) and `assistant-message` count is 0 for that row → click the button → assert the next user message contains `a2ui-action` → screenshot at widths 1100 and 390. No real model is needed: the mock provider streams the demo text verbatim.
 
-Multi-turn (verified in `mock-load-test-agent.ts:781,917`): `featureValues.mockAssistantResponses: string[]` is shifted one entry per turn (settled, not streamed). Use it for turn 2 (same `surfaceId` after the action) and turn 3 (adversarial). `mockStreamingAssistantResponse` takes precedence on every turn, so the streaming case gets its own test. Slice 2's `a2ui_render` tool call isn't emitted by the mock, so test it by calling the plugin RPC / `timeline.append` from the spec.
+Multi-turn (verified in `mock-load-test-agent.ts:781,917`): `featureValues.mockAssistantResponses: string[]` is shifted one entry per turn (settled, not streamed). Use it for turn 2 (same `surfaceId` after the action) and turn 3 (adversarial). `mockStreamingAssistantResponse` takes precedence on every turn, so the streaming case gets its own test. Slice 2's `send_a2ui` tool call isn't emitted by the mock, so test it by calling the tool handler from the spec and replaying `conformance/prompt/`.
 
 Required assertions (Argon phase-3 review):
 1. Streaming: an unclosed `<a2ui>` shows host `Loading`, no raw DSL. A tag inside a code fence stays code.
@@ -38,7 +38,7 @@ Required assertions (Argon phase-3 review):
 3. Action: edit a field, click primary, and the next user message holds a valid `a2ui-action` block with populated `context`.
 4. Update: turn 2 with the same `surfaceId` updates the live surface, and the earlier row collapses to an "updated below" stub (factory.md fold-in §2).
 5. Guards: malformed DSL, depth >12, or >200 components fall back to a source block. Non-`https:`/`mailto:` URLs are neutralised (fold-in §4).
-6. Slice 2: `a2ui_render` updates in place, and "Open in panel" renders it in `a2ui-canvas`.
+6. Slice 2: a `send_a2ui` post with `update=true` updates in place, and "Open in panel" renders it in `a2ui-canvas`.
 
 Native smoke (fold-in §7): one Jest/RNTL render test of `client/surface.tsx` next to `a2ui.test.ts`. Playwright only covers RN-web.
 
