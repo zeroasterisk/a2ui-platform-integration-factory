@@ -1,0 +1,134 @@
+{
+ "controls": "button, input, textarea, [role='radio'], [role='checkbox'], [role='switch'], [data-slot='toggle']",
+ "cases": [
+  {
+   "id": "fits-360-form",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "viewport": [
+    360,
+    800
+   ],
+   "textScale": 1,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "fits-360-text150-form",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "viewport": [
+    360,
+    800
+   ],
+   "textScale": 1.5,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "fits-412-form",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "viewport": [
+    412,
+    800
+   ],
+   "textScale": 1,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "fits-412-text150-form",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "viewport": [
+    412,
+    800
+   ],
+   "textScale": 1.5,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "fits-360-wide",
+   "source": "surface(\"wide\")\ntitle = Text(\"Run b7f3c1e9d2a4f6081357924680acebdf1234567890abcdef failed on ci-linux-x64-large-runner-pool\")\nr = Row([Button(Text(\"Retry all\"), action=Event(\"a\", {})), Button(Text(\"Revert merge\"), action=Event(\"b\", {})), Button(Text(\"Quarantine\"), action=Event(\"c\", {})), Button(Text(\"Open logs\"), action=Event(\"d\", {}))])\nroot = Card(Column([title, r]))",
+   "viewport": [
+    360,
+    800
+   ],
+   "textScale": 1,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "fits-360-text150-wide",
+   "source": "surface(\"wide\")\ntitle = Text(\"Run b7f3c1e9d2a4f6081357924680acebdf1234567890abcdef failed on ci-linux-x64-large-runner-pool\")\nr = Row([Button(Text(\"Retry all\"), action=Event(\"a\", {})), Button(Text(\"Revert merge\"), action=Event(\"b\", {})), Button(Text(\"Quarantine\"), action=Event(\"c\", {})), Button(Text(\"Open logs\"), action=Event(\"d\", {}))])\nroot = Card(Column([title, r]))",
+   "viewport": [
+    360,
+    800
+   ],
+   "textScale": 1.5,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "fits-412-wide",
+   "source": "surface(\"wide\")\ntitle = Text(\"Run b7f3c1e9d2a4f6081357924680acebdf1234567890abcdef failed on ci-linux-x64-large-runner-pool\")\nr = Row([Button(Text(\"Retry all\"), action=Event(\"a\", {})), Button(Text(\"Revert merge\"), action=Event(\"b\", {})), Button(Text(\"Quarantine\"), action=Event(\"c\", {})), Button(Text(\"Open logs\"), action=Event(\"d\", {}))])\nroot = Card(Column([title, r]))",
+   "viewport": [
+    412,
+    800
+   ],
+   "textScale": 1,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "fits-412-text150-wide",
+   "source": "surface(\"wide\")\ntitle = Text(\"Run b7f3c1e9d2a4f6081357924680acebdf1234567890abcdef failed on ci-linux-x64-large-runner-pool\")\nr = Row([Button(Text(\"Retry all\"), action=Event(\"a\", {})), Button(Text(\"Revert merge\"), action=Event(\"b\", {})), Button(Text(\"Quarantine\"), action=Event(\"c\", {})), Button(Text(\"Open logs\"), action=Event(\"d\", {}))])\nroot = Card(Column([title, r]))",
+   "viewport": [
+    412,
+    800
+   ],
+   "textScale": 1.5,
+   "expect": {
+    "fits": true
+   }
+  },
+  {
+   "id": "field-off-card-light",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "theme": "light",
+   "expect": {
+    "fieldOffCard": true
+   }
+  },
+  {
+   "id": "field-off-card-dark",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "theme": "dark",
+   "expect": {
+    "fieldOffCard": true
+   }
+  },
+  {
+   "id": "theme-follows-host",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "expect": {
+    "themeChanges": true
+   }
+  },
+  {
+   "id": "sent-reply-inert-dimmed-values-kept",
+   "source": "surface(\"triage\")\ntitle = Text(\"Flaky test triage\")\npick = ChoicePicker(label=\"Next step\", options=[{label: \"Retry\", value: \"retry\"}, {label: \"Revert\", value: \"revert\"}, {label: \"Quarantine\", value: \"quarantine\"}], value=$/choice, variant=\"mutuallyExclusive\")\nnote = TextField(label=\"Note for the team\", value=$/note)\nnotify = CheckBox(label=\"Tell #release\", value=$/notify)\ngo = Button(Text(\"Apply\"), variant=\"primary\", action=Event(\"apply\", {choice: $/choice, note: $/note, notify: $/notify}))\nroot = Card(Column([title, pick, note, notify, go]))\n$/choice = [\"retry\"]\n$/note = \"\"\n$/notify = false",
+   "expect": {
+    "lock": {
+     "fill": "Quarantining until #415 lands",
+     "press": "Apply"
+    }
+   }
+  }
+ ]
+}
