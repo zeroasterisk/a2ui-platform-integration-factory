@@ -23,3 +23,8 @@ Deps at slice 1 (apps/web, exact): `@a2ui/agent@0.1.0`, `@a2ui/web_core@0.15.0`,
 
 ## Slice 2 (canvas)
 "Open in panel" on a surface → a right-panel tab rendering the same surface live. This is something MCP Apps can't do (they're pinned to the tool row).
+
+## Slice 3 (agent side)
+- Pointer: `A2UI_POINTER` (≤1 KB) in `packages/provider-core/src/server/orchestrationInstructions.ts`, "Visuals and preview", so every provider gets it.
+- Tools: T3 MCP toolkit `apps/server/src/mcp/toolkits/a2ui/` = `a2ui_rules` + `a2ui_check` (both Readonly). Logic: `apps/server/src/a2ui/A2uiReplyCheck.ts`.
+- `conformance/prompt/` adapter (throwaway host test over the in-process MCP server, like `handlers.test.ts`): `toolNames = {rules: "a2ui_rules", send: "a2ui_check"}`, `capabilities = ["authorKind"]`. `earlier` maps `authorKind` person → `role: "user"`, agent → `"assistant"`. **`posted` := `a2ui_check(...).ok`**: the agent posts its own reply text, so the send tier is a check, not a post. Expected: 25/25 + 1 skip (ownership: one agent per thread).
